@@ -10,13 +10,29 @@ import {
 
 // Import grouped media arrays
 import heroImage from "../Images/heroImage";
-import { videos } from "../Videos/videos";
+// import { videos } from "../Videos/videos";
 import { accommodations } from "../Images/accommodations";
 import { experiences } from "../Images/experiences";
 import { nature } from "../Images/nature";
 import { restaurant } from "../Images/restaurant";
 
 export const Gallery = () => {
+  // const videoRefs = useRef([]);
+  // const [activeIndex, setActiveIndex] = useState(0);
+
+  // // Pause all videos except the active one
+  // useEffect(() => {
+  //   videoRefs.current.forEach((video, index) => {
+  //     if (video) {
+  //       if (index === activeIndex) {
+  //         video.play().catch(() => {}); // Auto-play active video
+  //       } else {
+  //         video.pause();
+  //         video.currentTime = 0; // Reset when not active
+  //       }
+  //     }
+  //   });
+  // }, [activeIndex]);
   const sections = [
     {
       key: "accommodations",
@@ -57,7 +73,7 @@ export const Gallery = () => {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Cinematic Views */}
+        {/* Cinematic Views
         <section className="py-20">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-light text-slate-800 mb-4 tracking-wide">
@@ -66,19 +82,29 @@ export const Gallery = () => {
             <div className="w-16 h-px bg-amber-600 mx-auto"></div>
           </div>
 
-          <div className="max-w-5xl mx-auto">
-            <Carousel className="w-full">
+          <div className="max-w-4xl mx-auto">
+            <Carousel
+              className="w-full"
+              opts={{ loop: true }}
+              onSelect={(embla) => {
+                setActiveIndex(embla.selectedScrollSnap());
+              }}
+            >
               <CarouselContent>
                 {videos.map((video, index) => (
                   <CarouselItem key={index}>
                     <div className="px-4">
                       <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white p-2">
-                        <div className="aspect-video overflow-hidden rounded-xl">
+                        <div className="flex items-center justify-center h-screen bg-black rounded-xl">
                           <video
+                            ref={(el) => (videoRefs.current[index] = el)}
                             src={video.src}
-                            controls
-                            className="w-full h-full object-cover"
+                            className="max-h-full max-w-full object-contain"
                             poster={heroImage}
+                            muted
+                            loop
+                            playsInline
+                            controls
                           />
                         </div>
                         <div className="p-6 text-center">
@@ -98,7 +124,7 @@ export const Gallery = () => {
               <CarouselNext className="border-0 bg-white/90 hover:bg-white shadow-lg -right-6" />
             </Carousel>
           </div>
-        </section>
+        </section> */}
 
         {/* All Sections */}
         {sections.map((section, index) => (

@@ -133,7 +133,7 @@ export const Contact = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-stone-100">
       {/* Hero Section */}
       <section
-        className="relative min-h-[60vh] flex items-center justify-center overflow-hidden"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden"
         style={{
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url('/sun.jpg')`,
           backgroundSize: "cover",
