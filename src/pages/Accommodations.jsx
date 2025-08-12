@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   User,
   Users,
@@ -243,7 +243,7 @@ export const Accommodations = () => {
   ];
 
   const RoomModal = ({ room, onClose }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 animate-[fadeIn_0.3s_ease-out]">
+    <div className="fixed inset-0 bg-transparent backdrop-blur-md flex items-center justify-center z-50 p-4 animate-[fadeIn_0.3s_ease-out]">
       <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-[fadeInUp_0.4s_ease-out]">
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
@@ -398,6 +398,19 @@ export const Accommodations = () => {
       </div>
     </div>
   );
+
+  useEffect(() => {
+    if (selectedRoom) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    // Cleanup in case component unmounts with modal open
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedRoom]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-stone-100">

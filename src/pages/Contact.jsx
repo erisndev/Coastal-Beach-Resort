@@ -228,13 +228,14 @@ export const Contact = () => {
               </div>
             </div>
 
-            {/* Map using react-leaflet */}
-            <div className="rounded-lg shadow-sm border border-gray-200 overflow-hidden h-[320px]">
+            {/* Map using react-leaflet with fixed z-index */}
+            <div className="relative z-0 rounded-lg shadow-sm border border-gray-200 overflow-hidden h-[320px]">
               <MapContainer
                 center={position}
                 zoom={13}
                 scrollWheelZoom={false}
                 className="h-full w-full"
+                style={{ zIndex: 1 }}
               >
                 <TileLayer
                   attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
@@ -447,7 +448,7 @@ export const Contact = () => {
         </section>
       </div>
 
-      {/* Add custom CSS animations */}
+      {/* Add custom CSS animations and z-index fixes */}
       <style jsx>{`
         @keyframes fadeInUp {
           from {
@@ -467,6 +468,19 @@ export const Contact = () => {
           to {
             opacity: 1;
           }
+        }
+
+        /* Ensure leaflet map doesn't interfere with navbar */
+        .leaflet-container {
+          z-index: 1 !important;
+        }
+
+        .leaflet-control-container {
+          z-index: 2 !important;
+        }
+
+        .leaflet-popup {
+          z-index: 3 !important;
         }
       `}</style>
     </div>

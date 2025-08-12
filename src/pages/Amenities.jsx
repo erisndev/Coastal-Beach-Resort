@@ -98,43 +98,80 @@ export const Amenities = () => {
   ];
 
   return (
-    <div ref={ref} className="bg-gray-50 min-h-screen">
-      {/* Header */}
-      <header className="text-center text-white">
-        <div
-          className="relative min-h-[40vh] sm:min-h-[50vh] lg:min-h-[60vh] bg-cover bg-center"
-          style={{ backgroundImage: `url(${experience})` }}
-        >
-          <div className="absolute inset-0 bg-black/20 backdrop-invert-30 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold text-teal-100 leading-tight">
-              Experiences <span className="font-serif">&</span> Amenities
-            </h2>
-            <p className="mt-4 text-base sm:text-lg lg:text-xl text-teal-100 max-w-2xl">
-              Wake up to sea views, unwind by the pool, and explore the South
-              Coast’s finest escapes.
-            </p>
-          </div>
+    <div
+      ref={ref}
+      className="min-h-screen bg-gradient-to-br from-slate-50 to-stone-100"
+    >
+      {/* Hero Section - Gallery Style */}
+      <section
+        className="relative min-h-screen flex items-center justify-center overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url(${experience})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
+        }}
+      >
+        <div className="text-center z-10 px-4">
+          <h1 className="text-6xl md:text-8xl font-extralight text-white mb-6 tracking-wider opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards]">
+            Experiences
+          </h1>
+          <h1 className="text-5xl md:text-7xl font-light text-white mb-8 tracking-wider opacity-0 animate-[fadeInUp_1.5s_ease-out_1s_forwards]">
+            <span className="font-serif">&</span> Amenities
+          </h1>
+          <p className="text-xl md:text-2xl text-teal-100 max-w-3xl mx-auto leading-relaxed opacity-0 animate-[fadeInUp_1.5s_ease-out_1.5s_forwards]">
+            Wake up to sea views, unwind by the pool, and explore the South
+            Coast's finest escapes.
+          </p>
+          <div className="w-24 h-px bg-white mx-auto mt-8 opacity-0 animate-[fadeIn_1s_ease-out_2s_forwards]"></div>
         </div>
-      </header>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-50"></div>
+      </section>
 
-      <div className="md:w-6xl place-self-center">
-        {/* Sections */}
+      {/* Content Sections */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Section
           title="Wellness"
           subtitle="Tailor-made retreats and tranquil escapes to rejuvenate body and mind."
           items={wellness}
+          index={0}
         />
         <Section
           title="Outdoor Adventures"
           subtitle="Exciting ocean and dam activities for thrill-seekers and nature lovers."
           items={adventures}
+          index={1}
         />
         <Section
           title="Culinary Delights"
           subtitle="Homestyle meals and curated catering for every occasion."
           items={culinary}
+          index={2}
         />
       </div>
+
+      {/* Custom CSS animations */}
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 };

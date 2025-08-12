@@ -240,26 +240,64 @@ export const Appointment = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="relative z-10 py-8 px-4 overflow-hidden w-full mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-stone-100">
+      {/* Background Carousel */}
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen flex flex-col">
         <BackgroundCarousel />
-        <div className="relative z-10">
-          <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
-              Book Your Perfect Stay
+        {/* Hero Section */}
+        <div className="flex-1 flex flex-col justify-center py-20 px-4">
+          <div className="text-center mb-12">
+            <h1 className="text-6xl md:text-8xl font-extralight text-white mb-6 tracking-wider opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards]">
+              Book Your
             </h1>
-            <p className="text-xl text-white/90 drop-shadow-md">
-              Experience luxury and comfort like never before
+            <h1 className="text-5xl md:text-7xl font-light text-white mb-8 tracking-wider opacity-0 animate-[fadeInUp_1.5s_ease-out_1s_forwards]">
+              Perfect Stay
+            </h1>
+            <p className="text-xl md:text-2xl text-teal-100 max-w-2xl mx-auto leading-relaxed opacity-0 animate-[fadeInUp_1.5s_ease-out_1.5s_forwards]">
+              Experience luxury and comfort like never before at our coastal
+              retreat
             </p>
+            <div className="w-24 h-px bg-white mx-auto mt-8 opacity-0 animate-[fadeIn_1s_ease-out_2s_forwards]"></div>
           </div>
-          <ProgressBar currentStep={currentStep} totalSteps={6} />
-          <div className="transition-all duration-500 ease-in-out transform">
-            {renderCurrentStep()}
+
+          {/* Progress Bar */}
+          <div className="opacity-0 animate-[fadeInUp_1.5s_ease-out_2.5s_forwards]">
+            <ProgressBar currentStep={currentStep} totalSteps={6} />
+          </div>
+
+          {/* Booking Form */}
+          <div className="opacity-0 animate-[fadeInUp_1.5s_ease-out_3s_forwards]">
+            <div className="transition-all duration-500 ease-in-out transform">
+              {renderCurrentStep()}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Custom CSS animations */}
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 };
-
-export default Appointment;
