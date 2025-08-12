@@ -10,11 +10,13 @@ import { Appointment } from "./pages/Appointment";
 import { Contact } from "./pages/Contact";
 import { About } from "./pages/About";
 import { Footer } from "./components/footer/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
     <Router>
       <Navbar />
+      <ScrollToTop />
       <div className="pt-16 bg-gray-100 min-h-screen">
         <Routes>
           <Route path="/" element={<Home />} />
