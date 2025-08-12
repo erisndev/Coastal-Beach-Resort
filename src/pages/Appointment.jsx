@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { DateGuestSelection } from "@/components/appointment-form/DateGuestSelection";
 import { RoomSelection } from "@/components/appointment-form/RoomSelection";
@@ -30,7 +31,7 @@ const BackgroundCarousel = () => {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [backgroundImages.length]);
+  }, []);
 
   return (
     <div className="absolute inset-0 -z-10">
@@ -54,11 +55,8 @@ const BackgroundCarousel = () => {
   );
 };
 
-// Main Appointment Component
 export const Appointment = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-
-  const [bookingData, setBookingData] = useState({
+  const defaultBookingData = {
     checkIn: "",
     checkOut: "",
     adults: 1,
@@ -77,50 +75,93 @@ export const Appointment = () => {
       cvv: "",
       cardName: "",
     },
+  };
+
+  // Load from localStorage if available
+  const [bookingData, setBookingData] = useState(() => {
+    const saved = localStorage.getItem("bookingData");
+    return saved ? JSON.parse(saved) : defaultBookingData;
   });
 
-  // Mock room data
+  const [currentStep, setCurrentStep] = useState(() => {
+    const saved = localStorage.getItem("currentStep");
+    return saved ? Number(saved) : 1;
+  });
+
+  // Save to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("bookingData", JSON.stringify(bookingData));
+  }, [bookingData]);
+
+  useEffect(() => {
+    localStorage.setItem("currentStep", currentStep);
+  }, [currentStep]);
+
   const allRooms = [
     {
       id: 1,
-      name: "Ocean View Suite",
-      price: 250,
+      name: "Standard Double Room",
+      price: 120,
       capacity: 2,
-      amenities: ["Ocean View", "King Bed", "Balcony", "Mini Bar"],
-      image: "🏖️",
+      amenities: ["1 Double Bed", "Parking", "WiFi", "Air Conditioning"],
+      image: "🛏️",
       available: true,
     },
     {
       id: 2,
-      name: "Garden Villa",
-      price: 180,
-      capacity: 4,
-      amenities: ["Garden View", "Two Beds", "Kitchenette", "Patio"],
-      image: "🌺",
+      name: "Deluxe Double Room",
+      price: 150,
+      capacity: 2,
+      amenities: ["1 Double Bed", "Parking", "WiFi", "Mini Bar"],
+      image: "🛏️✨",
       available: true,
     },
     {
       id: 3,
-      name: "Deluxe Family Room",
-      price: 320,
-      capacity: 6,
-      amenities: ["Two Bedrooms", "Living Area", "Kitchen", "Sea View"],
-      image: "🏠",
+      name: "Standard Chalet",
+      price: 200,
+      capacity: 4,
+      amenities: [
+        "Bedroom 1: 1 Double Bed",
+        "Bedroom 2: 1 Double Bed",
+        "Living Room: 1 Sofa Bed",
+        "Parking",
+        "WiFi",
+        "Kitchenette",
+      ],
+      image: "🏡",
       available: true,
     },
     {
       id: 4,
-      name: "Standard Room",
-      price: 120,
+      name: "Standard Queen Room",
+      price: 130,
       capacity: 2,
-      amenities: ["Queen Bed", "City View", "WiFi", "AC"],
-      image: "🛏️",
+      amenities: ["1 Queen Bed", "Parking", "WiFi", "Air Conditioning"],
+      image: "👑🛏️",
+      available: true,
+    },
+    {
+      id: 5,
+      name: "Presidential Suite",
+      price: 500,
+      capacity: 6,
+      amenities: [
+        "Multiple Bedrooms",
+        "Luxury Bathrooms",
+        "Living Room",
+        "Private Balcony",
+        "Sea View",
+        "Mini Bar",
+        "WiFi",
+      ],
+      image: "🏰",
       available: true,
     },
   ];
+
   const [rooms, setRooms] = useState(allRooms);
 
-  // Utility functions
   const calculateNights = () => {
     if (!bookingData.checkIn || !bookingData.checkOut) return 0;
     const checkIn = new Date(bookingData.checkIn);
@@ -132,40 +173,19 @@ export const Appointment = () => {
   const calculateTotal = () => {
     if (!bookingData.selectedRoom) return 0;
     const nights = calculateNights();
-    const roomTotal = bookingData.selectedRoom.price * nights;
-    return roomTotal;
+    return bookingData.selectedRoom.price * nights;
   };
 
-  // Navigation functions
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 6));
-
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   const startOver = () => {
     setCurrentStep(1);
-    setBookingData({
-      checkIn: "",
-      checkOut: "",
-      adults: 1,
-      children: 0,
-      selectedRoom: null,
-      guestDetails: {
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        specialRequests: "",
-      },
-      paymentDetails: {
-        cardNumber: "",
-        expiryDate: "",
-        cvv: "",
-        cardName: "",
-      },
-    });
+    setBookingData(defaultBookingData);
+    localStorage.removeItem("bookingData");
+    localStorage.removeItem("currentStep");
   };
 
-  // Component mapping
   const renderCurrentStep = () => {
     const stepProps = {
       bookingData,
@@ -173,7 +193,6 @@ export const Appointment = () => {
       onNext: nextStep,
       onPrev: prevStep,
     };
-
     switch (currentStep) {
       case 1:
         return (
@@ -181,7 +200,7 @@ export const Appointment = () => {
             {...stepProps}
             rooms={rooms}
             allRooms={allRooms}
-            setRooms={setRooms} // and setRooms if needed
+            setRooms={setRooms}
           />
         );
       case 2:
@@ -224,9 +243,7 @@ export const Appointment = () => {
     <div className="min-h-screen">
       <div className="relative z-10 py-8 px-4 overflow-hidden w-full mx-auto">
         <BackgroundCarousel />
-
         <div className="relative z-10">
-          {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
               Book Your Perfect Stay
@@ -235,10 +252,7 @@ export const Appointment = () => {
               Experience luxury and comfort like never before
             </p>
           </div>
-
           <ProgressBar currentStep={currentStep} totalSteps={6} />
-
-          {/* Main content with fade animation */}
           <div className="transition-all duration-500 ease-in-out transform">
             {renderCurrentStep()}
           </div>
