@@ -13,10 +13,13 @@ const BackgroundCarousel = () => {
 
   const backgroundImages = [
     "/hero-img.jpg",
-    "/dine.jpg",
-    "/dining.jpg",
+    "/house.jpg",
     "/pool.jpg",
     "/sunset.jpg",
+    "/bar.jpeg",
+    "/contact-1.jpg",
+    "/contact.jpg",
+    "/pool1.jpg",
   ];
 
   useEffect(() => {
