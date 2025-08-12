@@ -70,15 +70,15 @@ export const Footer = () => {
           <ul className="text-sm text-gray-300 space-y-3">
             <li className="flex items-start gap-2 justify-center md:justify-start">
               <MapPin size={16} className="flex-shrink-0 mt-0.5" />
-              <span>123 Beachfront Avenue, Polokwane</span>
+              <span>uMgababa, Amazimtoti</span>
             </li>
             <li className="flex items-start gap-2 justify-center md:justify-start">
               <Phone size={16} className="flex-shrink-0 mt-0.5" />
-              <span>+27 12 345 6789</span>
+              <span>031 285 0538</span>
             </li>
             <li className="flex items-start gap-2 justify-center md:justify-start">
               <Mail size={16} className="flex-shrink-0 mt-0.5" />
-              <span>info@coastalbeachresort.com</span>
+              <span>info@coastalbeach.co.za</span>
             </li>
           </ul>
         </div>

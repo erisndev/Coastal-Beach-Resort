@@ -212,7 +212,7 @@ export const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-light text-slate-800 mb-1">Phone</h4>
-                    <p className="text-slate-600">+27 39 973 2000</p>
+                    <p className="text-slate-600">031 285 0538</p>
                   </div>
                 </div>
 
@@ -222,9 +222,7 @@ export const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-light text-slate-800 mb-1">Email</h4>
-                    <p className="text-slate-600">
-                      contact@coastalbeachresort.co.za
-                    </p>
+                    <p className="text-slate-600">info@coastalbeach.co.za</p>
                   </div>
                 </div>
               </div>

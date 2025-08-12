@@ -9,13 +9,13 @@ export const Dining = () => {
         id: 1,
         title: "Dining Area",
         description: "Guests enjoying meals in our warm atmosphere",
-        src: "/images/restaurant/dining-area.jpg",
+        src: "/R1.png",
       },
       {
         id: 2,
         title: "Wood Fire Cooking",
         description: "Traditional cooking methods",
-        src: "/images/restaurant/wood-fire-cooking.jpg",
+        src: "/R2.png",
       },
       {
         id: 3,
@@ -27,7 +27,7 @@ export const Dining = () => {
         id: 4,
         title: "Tea Service",
         description: "Elegant afternoon tea presentation",
-        src: "/images/restaurant/tea-service.jpg",
+        src: "/R3.png",
       },
     ],
     conferences: [
@@ -35,19 +35,19 @@ export const Dining = () => {
         id: 1,
         title: "Conference Setup",
         description: "Professional meeting arrangements",
-        src: "/images/conferences/conference-setup.jpg",
+        src: "/C2.png",
       },
       {
         id: 2,
         title: "Welcome Setup",
         description: "Corporate hospitality area",
-        src: "/images/conferences/welcome-setup.jpg",
+        src: "/C1.png",
       },
       {
         id: 3,
         title: "Lounge Area",
         description: "Comfortable networking space",
-        src: "/images/conferences/lounge-area.jpg",
+        src: "/C3.png",
       },
     ],
     private: [
@@ -55,13 +55,13 @@ export const Dining = () => {
         id: 1,
         title: "Elegant Dining",
         description: "Private function dining setup",
-        src: "/images/private/elegant-dining.jpg",
+        src: "/P1.png",
       },
       {
         id: 2,
         title: "Event Space",
         description: "Versatile venue for celebrations",
-        src: "/images/private/event-space.jpg",
+        src: "/P2.png",
       },
     ],
   };
@@ -190,33 +190,13 @@ export const Dining = () => {
         </div>
       </section>
 
-      {/* A Glimpse of Our Celebrations */}
-      <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-4xl font-light text-center text-amber-800 mb-16">
-            A Glimpse of Our Celebrations
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-amber-600 to-amber-800 rounded-lg h-48 flex items-center justify-center text-white text-lg hover:shadow-xl transition-shadow cursor-pointer">
-              Wedding Reception
-            </div>
-            <div className="bg-gradient-to-br from-amber-700 to-amber-900 rounded-lg h-48 flex items-center justify-center text-white text-lg hover:shadow-xl transition-shadow cursor-pointer">
-              Corporate Dinner
-            </div>
-            <div className="bg-gradient-to-br from-amber-800 to-amber-900 rounded-lg h-48 flex items-center justify-center text-white text-lg hover:shadow-xl transition-shadow cursor-pointer">
-              Garden Party
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Property Surroundings */}
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-light text-amber-800 mb-8">
             Property surroundings
           </h2>
-          <p className="text-blue-600 mb-8">
+          <p className="text-amber-600 mb-8">
             Guests loved walking around the neighbourhood! Good location - show
             map
           </p>
@@ -226,15 +206,15 @@ export const Dining = () => {
               <h3 className="text-xl font-medium mb-4">Restaurants & cafes</h3>
               <div className="space-y-3">
                 <div>
-                  <span className="text-blue-600">Restaurant</span> •{" "}
+                  <span className="text-amber-600">Restaurant</span> •{" "}
                   <span>Crows Nest Restaurant</span>
                 </div>
                 <div>
-                  <span className="text-blue-600">Restaurant</span> •{" "}
+                  <span className="text-amber-600">Restaurant</span> •{" "}
                   <span>KFC</span>
                 </div>
                 <div>
-                  <span className="text-blue-600">Restaurant</span> •{" "}
+                  <span className="text-amber-600">Restaurant</span> •{" "}
                   <span>Sebastians Seafood Grill & Pub</span>
                 </div>
               </div>
