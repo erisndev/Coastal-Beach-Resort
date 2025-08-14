@@ -7,6 +7,8 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTiktok } from "@fortawesome/free-brands-svg-icons";
 
 export const Footer = () => {
   return (
@@ -167,29 +169,22 @@ export const Footer = () => {
             </p>
             <div className="flex space-x-4 justify-center md:justify-start">
               <a
-                href="#"
-                className="group relative p-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-blue-600 hover:scale-110 hover:border-white/20"
-                aria-label="Facebook"
+                href="https://www.tiktok.com/@coastalbeachresor/video/7537706157637406008?_t=ZS-8yom0dHBtDs&_r=1"
+                target="_blank"
+                className="group relative p-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-black hover:scale-110 hover:border-white/20"
+                aria-label="TikTok"
               >
-                <Facebook
-                  size={20}
+                <FontAwesomeIcon
+                  icon={faTiktok}
+                  size="lg"
                   className="text-slate-300 group-hover:text-white transition-colors duration-300"
                 />
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
+
               <a
-                href="#"
-                className="group relative p-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-pink-600 hover:scale-110 hover:border-white/20"
-                aria-label="Instagram"
-              >
-                <Instagram
-                  size={20}
-                  className="text-slate-300 group-hover:text-white transition-colors duration-300"
-                />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </a>
-              <a
-                href="#"
+                href="https://x.com/coastal_re23852?s=21"
+                target="_blank"
                 className="group relative p-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-blue-400 hover:scale-110 hover:border-white/20"
                 aria-label="Twitter"
               >

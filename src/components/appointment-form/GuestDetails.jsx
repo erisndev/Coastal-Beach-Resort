@@ -1,7 +1,6 @@
 import React from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-// Step 3 Component: Guest Details
 export const GuestDetails = ({
   bookingData,
   setBookingData,
@@ -35,7 +34,6 @@ export const GuestDetails = ({
               onChange={(e) =>
                 handleGuestDetailsChange("firstName", e.target.value)
               }
-              placeholder="Enter first name"
             />
           </div>
           <div>
@@ -49,56 +47,37 @@ export const GuestDetails = ({
               onChange={(e) =>
                 handleGuestDetailsChange("lastName", e.target.value)
               }
-              placeholder="Enter last name"
             />
           </div>
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Email Address
+            Email
           </label>
           <input
             type="email"
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
             value={bookingData.guestDetails.email}
             onChange={(e) => handleGuestDetailsChange("email", e.target.value)}
-            placeholder="Enter email address"
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Phone Number
+            Phone
           </label>
           <input
             type="tel"
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
             value={bookingData.guestDetails.phone}
             onChange={(e) => handleGuestDetailsChange("phone", e.target.value)}
-            placeholder="Enter phone number"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Special Requests (Optional)
-          </label>
-          <textarea
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 h-24"
-            value={bookingData.guestDetails.specialRequests}
-            onChange={(e) =>
-              handleGuestDetailsChange("specialRequests", e.target.value)
-            }
-            placeholder="Any special requests or requirements?"
           />
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-between">
+      <div className="mt-8 flex justify-between">
         <button
           onClick={onPrev}
-          className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 flex items-center justify-center"
+          className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 flex items-center"
         >
           <ArrowLeft className="mr-2 w-4 h-4" />
           Back
@@ -111,9 +90,9 @@ export const GuestDetails = ({
             !bookingData.guestDetails.email ||
             !bookingData.guestDetails.phone
           }
-          className="bg-amber-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+          className="bg-amber-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-amber-700 flex items-center"
         >
-          Continue to Confirmation
+          Continue
           <ArrowRight className="ml-2 w-4 h-4" />
         </button>
       </div>

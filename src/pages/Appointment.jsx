@@ -1,5 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+
 import { DateGuestSelection } from "@/components/appointment-form/DateGuestSelection";
 import { RoomSelection } from "@/components/appointment-form/RoomSelection";
 import { GuestDetails } from "@/components/appointment-form/GuestDetails";
@@ -7,6 +9,7 @@ import { BookingConfirmation } from "@/components/appointment-form/BookingConfir
 import { PaymentDetails } from "@/components/appointment-form/PaymentDetails";
 import { BookingReceipt } from "@/components/appointment-form/BookingReceipt";
 import { ProgressBar } from "@/components/appointment-form/ProgressBar";
+
 
 // Background carousel component
 const BackgroundCarousel = () => {
@@ -88,6 +91,8 @@ export const Appointment = () => {
     return saved ? Number(saved) : 1;
   });
 
+  const [rooms, setRooms] = useState([]);
+
   // Save to localStorage on change
   useEffect(() => {
     localStorage.setItem("bookingData", JSON.stringify(bookingData));
@@ -97,71 +102,7 @@ export const Appointment = () => {
     localStorage.setItem("currentStep", currentStep);
   }, [currentStep]);
 
-  const allRooms = [
-    {
-      id: 1,
-      name: "Standard Double Room",
-      price: 120,
-      capacity: 2,
-      amenities: ["1 Double Bed", "Parking", "WiFi", "Air Conditioning"],
-      image: "🛏️",
-      available: true,
-    },
-    {
-      id: 2,
-      name: "Deluxe Double Room",
-      price: 150,
-      capacity: 2,
-      amenities: ["1 Double Bed", "Parking", "WiFi", "Mini Bar"],
-      image: "🛏️✨",
-      available: true,
-    },
-    {
-      id: 3,
-      name: "Standard Chalet",
-      price: 200,
-      capacity: 4,
-      amenities: [
-        "Bedroom 1: 1 Double Bed",
-        "Bedroom 2: 1 Double Bed",
-        "Living Room: 1 Sofa Bed",
-        "Parking",
-        "WiFi",
-        "Kitchenette",
-      ],
-      image: "🏡",
-      available: true,
-    },
-    {
-      id: 4,
-      name: "Standard Queen Room",
-      price: 130,
-      capacity: 2,
-      amenities: ["1 Queen Bed", "Parking", "WiFi", "Air Conditioning"],
-      image: "👑🛏️",
-      available: true,
-    },
-    {
-      id: 5,
-      name: "Presidential Suite",
-      price: 500,
-      capacity: 6,
-      amenities: [
-        "Multiple Bedrooms",
-        "Luxury Bathrooms",
-        "Living Room",
-        "Private Balcony",
-        "Sea View",
-        "Mini Bar",
-        "WiFi",
-      ],
-      image: "🏰",
-      available: true,
-    },
-  ];
-
-  const [rooms, setRooms] = useState(allRooms);
-
+  
   const calculateNights = () => {
     if (!bookingData.checkIn || !bookingData.checkOut) return 0;
     const checkIn = new Date(bookingData.checkIn);
@@ -186,6 +127,7 @@ export const Appointment = () => {
     localStorage.removeItem("currentStep");
   };
 
+  
   const renderCurrentStep = () => {
     const stepProps = {
       bookingData,
@@ -193,22 +135,22 @@ export const Appointment = () => {
       onNext: nextStep,
       onPrev: prevStep,
     };
+
     switch (currentStep) {
       case 1:
         return (
           <DateGuestSelection
             {...stepProps}
             rooms={rooms}
-            allRooms={allRooms}
             setRooms={setRooms}
           />
         );
       case 2:
         return (
           <RoomSelection
-            {...stepProps}
-            rooms={rooms}
-            calculateNights={calculateNights}
+          {...stepProps}
+          rooms={rooms}
+          calculateNights={calculateNights}
           />
         );
       case 3:
@@ -241,13 +183,11 @@ export const Appointment = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-stone-100">
-      {/* Background Carousel */}
-
-      {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
         <BackgroundCarousel />
-        {/* Hero Section */}
+
         <div className="flex-1 flex flex-col justify-center py-20 px-4">
+          {/* Hero Section */}
           <div className="text-center mb-12">
             <h1 className="text-6xl md:text-8xl font-extralight text-white mb-6 tracking-wider opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards]">
               Book Your
@@ -276,7 +216,6 @@ export const Appointment = () => {
         </div>
       </div>
 
-      {/* Custom CSS animations */}
       <style jsx>{`
         @keyframes fadeInUp {
           from {
@@ -288,7 +227,6 @@ export const Appointment = () => {
             transform: translateY(0);
           }
         }
-
         @keyframes fadeIn {
           from {
             opacity: 0;

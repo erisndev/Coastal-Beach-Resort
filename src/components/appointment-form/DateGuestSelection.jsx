@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Calendar, Users, ArrowRight, Loader2 } from "lucide-react";
+import { checkRoomAvailability } from "../../API/Api";
+import { toast } from "react-toastify";
 
 export const DateGuestSelection = ({
   bookingData,
   setBookingData,
   onNext,
-  allRooms,
   setRooms,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -19,23 +20,55 @@ export const DateGuestSelection = ({
   };
 
   const handleSearch = async () => {
+    if (!bookingData.checkIn || !bookingData.checkOut) {
+      alert("Please select check-in and check-out dates.");
+      return;
+    }
+
     setLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       const guestCount = bookingData.adults + bookingData.children;
 
-      const filteredRooms = allRooms.filter(
-        (room) => room.capacity >= guestCount && room.available
+      const searchData = {
+        roomTypeId: null,
+        checkIn: bookingData.checkIn,
+        checkOut: bookingData.checkOut,
+        guests: guestCount,
+      };
+      console.log("Searching rooms with data: ", searchData);
+
+      // ✅ Call backend to fetch available rooms
+      const availableRooms = await checkRoomAvailability(
+        searchData.roomTypeId,
+        searchData.checkIn,
+        searchData.checkOut,
+        searchData.guests
       );
 
-      setRooms(filteredRooms);
+      if (availableRooms.length === 0) {
+        toast.warn("No rooms available for selected dates and guests.");
+        setRooms([]);
+      } else {
+        // Map backend fields to frontend-friendly format
+        const formattedRooms = availableRooms.map((room) => ({
+          _id: room._id,
+          name: room.name,
+          capacity: room.capacity,
+          price: room.pricePerNight,
+          amenities: room.amenities,
+          totalUnits: room.totalUnits,
+        }));
 
-      alert("Rooms searched successfully!");
-      onNext();
+        console.log("Rooms found:", formattedRooms);
+
+        setRooms(formattedRooms);
+
+        toast.success("Rooms searched successfully!");
+        onNext(); // move to next step (RoomSelection)
+      }
     } catch (error) {
       console.error("Error searching rooms:", error);
-      alert("Unable to search rooms. Please try again.");
+      toast.error("Unable to search rooms. Please try again.");
     } finally {
       setLoading(false);
     }
