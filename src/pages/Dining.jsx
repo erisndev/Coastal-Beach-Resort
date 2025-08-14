@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const Dining = () => {
   const [activeGallery, setActiveGallery] = useState("restaurant");
+  const navigete = useNavigate();
+
+  const handleContact = () => {
+    navigete("/contact");
+  };
 
   const galleryImages = {
     restaurant: [
@@ -115,7 +121,10 @@ export const Dining = () => {
                 planning team will ensure every detail is perfect. Our versatile
                 spaces can accommodate gatherings with breathtaking views.
               </p>
-              <Button className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-12 py-4 rounded-full text-lg font-light tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <Button
+                onClick={handleContact}
+                className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-12 py-4 rounded-full text-lg font-light tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              >
                 Plan Your Event
                 <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
                   →
@@ -145,7 +154,10 @@ export const Dining = () => {
                 services with attention to every detail, ensuring your special
                 day exceeds expectations.
               </p>
-              <Button className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-12 py-4 rounded-full text-lg font-light tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <Button
+                onClick={handleContact}
+                className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-12 py-4 rounded-full text-lg font-light tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              >
                 Contact Our Planners
                 <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
                   →

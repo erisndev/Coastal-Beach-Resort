@@ -6,7 +6,7 @@ export function Section({ title, subtitle, items }) {
     <section className="py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8 max-w-screen-xl mx-auto">
       {/* Section Header */}
       <div className="mb-8 text-center">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-teal-700">
+        <h2 className="text-4xl md:text-5xl font-light text-slate-800 mb-4 tracking-wide">
           {title}
         </h2>
 

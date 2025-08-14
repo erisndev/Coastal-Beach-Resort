@@ -72,6 +72,9 @@ export const Accommodations = () => {
           "Upper floors accessible by stairs only",
           "Clothes rack",
           "Single-room air conditioning",
+          "Ironing facilities",
+          "Satellite channels",
+          "Tea/Coffie maker",
         ],
       },
       features: [
@@ -86,6 +89,7 @@ export const Accommodations = () => {
         "Soundproofing",
         "Free WiFi",
       ],
+      smoking: "No smoking",
     },
     {
       id: "deluxe-double",
@@ -131,6 +135,10 @@ export const Accommodations = () => {
           "Patio",
           "Wardrobe or closet",
           "Clothes rack",
+          "Refrigerator",
+          "Ironing facilities",
+          "Satellite channels",
+          "Single-room air conditioning",
         ],
       },
       features: [
@@ -144,6 +152,7 @@ export const Accommodations = () => {
         "Soundproofing",
         "Free WiFi",
       ],
+      smoking: "No smoking",
     },
     {
       id: "standard-chalet",
@@ -191,6 +200,18 @@ export const Accommodations = () => {
           "Iron",
           "Flat-screen TV",
           "Electric kettle",
+          "Cleaning products",
+          "Patio",
+          "Tile/marbel floor",
+          "Warddrobe",
+          "Seating Areas",
+          "Upper floora accessible by stairs only",
+          "Soundproofing",
+          "Clothes rack",
+          "TV",
+          "Refrigerator",
+          "Ironing facilities",
+          "Satellite channels",
         ],
       },
       features: [
@@ -204,6 +225,7 @@ export const Accommodations = () => {
         "Soundproofing",
         "Free WiFi",
       ],
+      smoking: "No smoking",
     },
     {
       id: "standard-queen",

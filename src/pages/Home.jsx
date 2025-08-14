@@ -17,7 +17,6 @@ export const Home = () => {
         "Relax in our stunning beachfront pool area with crystal-clear waters and comfortable loungers, perfect for sunbathing and unwinding by the sea.",
       imageUrl: "/pool.jpg", // Replace with actual image path
       gradient: "from-sky-100 to-blue-200",
-      buttonText: "Dive In",
     },
     {
       title: "Sunset Viewing",
@@ -25,7 +24,6 @@ export const Home = () => {
         "Experience breathtaking ocean sunsets from our rooftop terrace, offering panoramic views and unforgettable romantic moments.",
       imageUrl: "/sunset.jpg", // Replace with actual image path
       gradient: "from-yellow-100 to-rose-200",
-      buttonText: "View Sunset Spots",
     },
     {
       title: "Fine Dining Experience",
@@ -33,7 +31,6 @@ export const Home = () => {
         "Indulge in our fine dining with gourmet meals and expertly crafted cocktails, served in an elegant indoor setting with ocean views.",
       imageUrl: "/dine.jpg", // Replace with actual image path
       gradient: "from-amber-100 to-orange-200",
-      buttonText: "View Menu",
     },
   ];
 
@@ -133,46 +130,9 @@ export const Home = () => {
                   <CardDescription className="text-slate-600 mb-6 leading-relaxed">
                     {item.description}
                   </CardDescription>
-                  <Button
-                    variant="link"
-                    className="p-0 text-amber-600 font-light hover:text-amber-700 transition-colors duration-300 group/btn"
-                  >
-                    {item.buttonText}
-                    <span className="ml-1 transition-transform duration-300 group-hover/btn:translate-x-1">
-                      →
-                    </span>
-                  </Button>
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stay Connected Section */}
-      <section className="py-20 px-6 border-t border-slate-200">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-light text-slate-800 mb-4 tracking-wide">
-            Stay Connected
-          </h2>
-          <div className="w-16 h-px bg-amber-600 mx-auto mb-12"></div>
-          <p className="text-lg text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Sign up for our newsletter to receive exclusive offers, updates, and
-            news from Coastal Beach Resort.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
-            <Input
-              type="email"
-              placeholder="Your email address"
-              className="flex-1 py-4 px-6 text-center sm:text-left rounded-full border-slate-300 focus:border-amber-500 focus:ring-amber-500 transition-all duration-300"
-            />
-            <Button className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-8 py-4 font-light rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-              Subscribe
-              <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
-                →
-              </span>
-            </Button>
           </div>
         </div>
       </section>

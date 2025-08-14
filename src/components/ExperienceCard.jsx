@@ -25,10 +25,10 @@ export function ExperienceCard({
             alt={imgAltTitle}
             className="w-full h-full object-cover rounded-t-xl"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-teal-700/20 rounded-t-xl" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-amber-700/20 rounded-t-xl" />
         </div>
         <CardHeader className="px-4 pt-4">
-          <CardTitle className="text-lg sm:text-xl font-semibold text-teal-700">
+          <CardTitle className="text-lg sm:text-xl font-semibold text-amber-700">
             {title}
           </CardTitle>
           <CardDescription className="mt-2 text-sm sm:text-base text-muted-foreground">
@@ -38,7 +38,7 @@ export function ExperienceCard({
         <CardFooter className="px-4 pb-4">
           <div className="w-full active:scale-95 transition-transform duration-150">
             <Button
-              className="w-full text-sm sm:text-base transition-all duration-300 hover:bg-teal-600 hover:text-white hover:scale-[1.02]"
+              className="w-full text-sm sm:text-base transition-all duration-300 hover:bg-amber-600 hover:text-white hover:scale-[1.02]"
               variant="outline"
               onClick={onClick}
             >
