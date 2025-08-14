@@ -168,17 +168,13 @@ export const Testimonials = () => {
 
   const allLoaded = visibleCount >= testimonials.length;
 
-  // Hero background image
-  const heroImage =
-    "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&h=800&fit=crop";
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-stone-100">
       {/* Hero Section - Gallery Style */}
       <section
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), url(${heroImage})`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), url("/test.jpeg")`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",

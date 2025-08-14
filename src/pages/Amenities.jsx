@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import experience from "@/assets/experience.jpg";
 import { Section } from "@/components/Section";
 
 import bike from "@/assets/bike-ride.jpg";
@@ -106,7 +105,7 @@ export const Amenities = () => {
       <section
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url(${experience})`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url("/bikes.jpeg")`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",

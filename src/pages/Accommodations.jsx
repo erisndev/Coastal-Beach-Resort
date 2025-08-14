@@ -16,6 +16,8 @@ import {
   Home,
   Crown,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 export const Accommodations = () => {
@@ -25,8 +27,16 @@ export const Accommodations = () => {
     {
       id: "standard-double",
       name: "Standard Double Room",
-      image:
-        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      images: [
+        "/SD1.jpg",
+        "/SD2.jpg",
+        "/SD3.jpg",
+        "/SD4.jpg",
+        "/SD5.jpg",
+        "/SD6.jpg",
+        "/SD7.jpg",
+        "/SD8.jpg",
+      ],
       size: "22 m²",
       guests: 2,
       beds: "1 double bed",
@@ -80,8 +90,16 @@ export const Accommodations = () => {
     {
       id: "deluxe-double",
       name: "Deluxe Double Room",
-      image:
-        "https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      images: [
+        "/DD1.jpg",
+        "/DD2.jpg",
+        "/DD3.jpg",
+        "/DD4.jpg",
+        "/DD5.jpg",
+        "/DD6.jpg",
+        "/DD7.jpg",
+        "/DD8.jpg",
+      ],
       size: "26 m²",
       guests: 2,
       beds: "1 double bed",
@@ -130,8 +148,23 @@ export const Accommodations = () => {
     {
       id: "standard-chalet",
       name: "Standard Chalet",
-      image:
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      images: [
+        "/SC7.jpg",
+        "/SC1.jpg",
+        "/SC2.jpg",
+        "/SC3.jpg",
+        "/SC4.jpg",
+        "/SC5.jpg",
+        "/SC6.jpg",
+        "/SC8.jpg",
+        "/SC9.jpg",
+        "/SC10.jpg",
+        "/SC11.jpg",
+        "/SC12.jpg",
+        "/SC13.jpg",
+        "/SC14.jpg",
+        "/SC15.jpg",
+      ],
       size: "65 m²",
       guests: 4,
       beds: "Bedroom 1: 1 double bed, Bedroom 2: 1 double bed, Living room: 1 sofa bed",
@@ -175,8 +208,11 @@ export const Accommodations = () => {
     {
       id: "standard-queen",
       name: "Standard Queen Room",
-      image:
+      images: [
         "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1576354302919-96748cb8299e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1540518614846-7eded47ee3b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      ],
       size: "40 m²",
       guests: 2,
       beds: "1 queen bed",
@@ -209,8 +245,14 @@ export const Accommodations = () => {
     {
       id: "presidential-suite",
       name: "Presidential Suite",
-      image:
+      images: [
         "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1591088398332-8a7791972843?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1559599238-c3f8c86fe14e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1573052905904-34ad8c27f0cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      ],
       guests: 6,
       comfyRating: 8.5,
       reviews: 50,
@@ -242,6 +284,85 @@ export const Accommodations = () => {
     },
   ];
 
+  const ImageSlider = ({ images, roomName }) => {
+    const [currentImage, setCurrentImage] = useState(0);
+
+    const nextImage = () => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    };
+
+    const prevImage = () => {
+      setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
+    };
+
+    const goToImage = (index) => {
+      setCurrentImage(index);
+    };
+
+    return (
+      <div className="relative">
+        {/* Main Image Display */}
+        <div className="aspect-[4/3] overflow-hidden rounded-xl mb-4 shadow-lg relative group">
+          <img
+            src={images[currentImage]}
+            alt={`${roomName} - Image ${currentImage + 1}`}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+
+          {/* Navigation Arrows */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
+                aria-label="Previous image"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
+                aria-label="Next image"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </>
+          )}
+
+          {/* Image Counter */}
+          {images.length > 1 && (
+            <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">
+              {currentImage + 1} / {images.length}
+            </div>
+          )}
+        </div>
+
+        {/* Thumbnail Navigation */}
+        {images.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {images.map((image, index) => (
+              <button
+                key={index}
+                onClick={() => goToImage(index)}
+                className={`flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                  index === currentImage
+                    ? "border-amber-500 shadow-lg"
+                    : "border-transparent hover:border-gray-300"
+                }`}
+              >
+                <img
+                  src={image}
+                  alt={`${roomName} thumbnail ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const RoomModal = ({ room, onClose }) => (
     <div className="fixed inset-0 bg-transparent backdrop-blur-md flex items-center justify-center z-50 p-4 animate-[fadeIn_0.3s_ease-out]">
       <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-[fadeInUp_0.4s_ease-out]">
@@ -260,15 +381,10 @@ export const Accommodations = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <div className="aspect-[4/3] overflow-hidden rounded-xl mb-6 shadow-lg">
-                <img
-                  src={room.image}
-                  alt={room.name}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </div>
+              {/* Image Slider Component */}
+              <ImageSlider images={room.images} roomName={room.name} />
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mt-6">
                 {room.features.map((feature, index) => (
                   <span
                     key={index}
@@ -418,7 +534,7 @@ export const Accommodations = () => {
       <section
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url('hero-img.jpg')`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url('/house.jpg')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
@@ -464,12 +580,18 @@ export const Accommodations = () => {
                   animation: "fadeInUp 0.6s ease-out forwards",
                 }}
               >
-                <div className="aspect-[4/3] overflow-hidden">
+                <div className="aspect-[4/3] overflow-hidden relative">
                   <img
-                    src={room.image}
+                    src={room.images[0]}
                     alt={room.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
+                  {/* Photo count indicator */}
+                  {room.images.length > 1 && (
+                    <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium">
+                      +{room.images.length - 1} photos
+                    </div>
+                  )}
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
