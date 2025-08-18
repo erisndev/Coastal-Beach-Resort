@@ -1,9 +1,13 @@
 // src/API/api.js
-const API_BASE = "http://localhost:5000/api";
 
-// Helper to get headers with token
+// ===== Base URL =====
+let API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+// ===== Token Handling =====
+const TOKEN_KEY = "adminToken";
+
 const getAuthHeaders = (extra = {}) => {
-  const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem(TOKEN_KEY);
   return {
     "Content-Type": "application/json",
     ...(token && { Authorization: `Bearer ${token}` }),
@@ -24,7 +28,7 @@ export const loginAdmin = async (email, password) => {
       throw new Error(err.message || "Login failed");
     }
     const data = await response.json();
-    localStorage.setItem("adminToken", data.token);
+    localStorage.setItem(TOKEN_KEY, data.token);
     return data;
   } catch (error) {
     console.error("Error logging in admin:", error);

@@ -91,11 +91,20 @@ const RoomTable = ({ roomTypes, onEdit, onDelete }) => {
               <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                 <div className="flex flex-wrap gap-2 items-center">
                   <span className="px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 rounded text-xs font-semibold">
-                    Total: {room.totalUnits}
+                    Total: {room.totalUnits || 0}
                   </span>
-                  <span className="px-2 py-1 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100 rounded text-xs font-semibold">
-                    Available: {room.availableUnits ?? room.totalUnits}
+                  <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                    (room.availableUnits || 0) > 0 
+                      ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100'
+                      : 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-100'
+                  }`}>
+                    Available: {room.availableUnits || 0}
                   </span>
+                  {(room.bookedUnits || 0) > 0 && (
+                    <span className="px-2 py-1 bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-100 rounded text-xs font-semibold">
+                      Booked: {room.bookedUnits || 0}
+                    </span>
+                  )}
                 </div>
               </td>
 

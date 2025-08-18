@@ -1,5 +1,6 @@
 // src/pages/admin/Rooms.jsx
 import React, { useState, useEffect } from "react";
+import { RefreshCw } from "lucide-react";
 import RoomTable from "../admin/components/admin/RoomTable";
 import RoomForm from "../admin/components/admin/RoomForm";
 import {
@@ -7,6 +8,8 @@ import {
   createRoomType,
   updateRoomType,
   deleteRoomType,
+  fetchBookings,
+  checkRoomAvailability,
 } from "../../API/Api";
 
 export const Rooms = () => {
@@ -26,8 +29,55 @@ export const Rooms = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchRoomTypes();
-      setRoomTypes(Array.isArray(data) ? data : []);
+      const [roomTypesData, bookingsData] = await Promise.all([
+        fetchRoomTypes(),
+        fetchBookings(),
+      ]);
+
+      const roomTypesArray = Array.isArray(roomTypesData) ? roomTypesData : [];
+      const bookingsArray = Array.isArray(bookingsData) ? bookingsData : [];
+
+      // Calculate real-time availability by counting booked rooms
+      const roomTypesWithAvailability = roomTypesArray.map((roomType) => {
+        // Count currently booked rooms for this room type
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const relevantBookings = bookingsArray.filter((booking) => {
+          // Check if booking is for this room type
+          const bookingRoomTypeId = booking.room?.roomType?._id;
+          const isThisRoomType = bookingRoomTypeId === roomType._id;
+
+          if (!isThisRoomType) return false;
+
+          // Count all confirmed bookings (not cancelled) that haven't checked out yet
+          const checkOut = new Date(booking.checkOut);
+          checkOut.setHours(0, 0, 0, 0);
+
+          // Booking affects availability if:
+          // 1. It's confirmed (not cancelled)
+          // 2. Check-out date hasn't passed (room is still occupied or will be occupied)
+          const isConfirmed = booking.status !== "cancelled";
+          const hasNotCheckedOut = checkOut > today;
+          const affectsAvailability = isConfirmed && hasNotCheckedOut;
+
+          return affectsAvailability;
+        });
+
+        const bookedCount = relevantBookings.length;
+        const availableCount = Math.max(
+          0,
+          (roomType.totalUnits || 0) - bookedCount
+        );
+
+        return {
+          ...roomType,
+          availableUnits: availableCount,
+          bookedUnits: bookedCount,
+        };
+      });
+
+      setRoomTypes(roomTypesWithAvailability);
     } catch (err) {
       console.error(err);
       setError("Failed to load room types. Try again.");
@@ -107,6 +157,14 @@ export const Rooms = () => {
               {error}
             </div>
           )}
+          <button
+            onClick={loadRoomTypes}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
           <button
             onClick={handleAddRoom}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"

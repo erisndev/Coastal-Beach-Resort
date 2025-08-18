@@ -306,6 +306,13 @@ export const Appointment = () => {
       lastName: "",
       email: "",
       phone: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      postalCode: "",
+      dateOfBirth: "",
+      gender: "",
       specialRequests: "",
     },
     paymentDetails: {
@@ -326,30 +333,9 @@ export const Appointment = () => {
     return saved ? Number(saved) : 1;
   });
 
-  // Mock data for rooms
-  const [rooms, setRooms] = useState([
-    {
-      _id: 1,
-      name: "Deluxe Ocean View",
-      price: 1500,
-      capacity: 2,
-      description: "Luxury room with ocean view",
-    },
-    {
-      _id: 2,
-      name: "Family Suite",
-      price: 2500,
-      capacity: 4,
-      description: "Spacious suite perfect for families",
-    },
-    {
-      _id: 3,
-      name: "Honeymoon Villa",
-      price: 3000,
-      capacity: 2,
-      description: "Romantic villa for couples",
-    },
-  ]);
+  // Rooms found from availability search
+  const [rooms, setRooms] = useState([]);
+  const [availableUnits, setAvailableUnits] = useState([]);
 
   useEffect(() => {
     localStorage.setItem("bookingData", JSON.stringify(bookingData));
@@ -398,6 +384,7 @@ export const Appointment = () => {
             {...stepProps}
             rooms={rooms}
             setRooms={setRooms}
+            setAvailableUnits={setAvailableUnits}
           />
         );
       case 2:
@@ -405,6 +392,7 @@ export const Appointment = () => {
           <RoomSelection
             {...stepProps}
             rooms={rooms}
+            availableUnits={availableUnits}
             calculateNights={calculateNights}
           />
         );
@@ -416,11 +404,19 @@ export const Appointment = () => {
             {...stepProps}
             calculateNights={calculateNights}
             calculateTotal={calculateTotal}
+            setAvailableUnits={setAvailableUnits}
           />
         );
       case 5:
         return (
-          <PaymentDetails {...stepProps} calculateTotal={calculateTotal} />
+          <PaymentDetails
+            {...stepProps}
+            calculateTotal={calculateTotal}
+            onPaymentSuccess={(transaction) => {
+              console.log("Payment success:", transaction);
+              nextStep(); // move to receipt page
+            }}
+          />
         );
       case 6:
         return (

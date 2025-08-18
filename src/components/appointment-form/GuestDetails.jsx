@@ -1,5 +1,17 @@
-import React from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+/* eslint-disable react-hooks/exhaustive-deps */
+
+import React, { useState, useEffect } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Users,
+  AlertCircle,
+} from "lucide-react";
 
 export const GuestDetails = ({
   bookingData,
@@ -7,93 +19,369 @@ export const GuestDetails = ({
   onNext,
   onPrev,
 }) => {
+  const [errors, setErrors] = useState({});
+  const [guest, setGuest] = useState({});
+
+  useEffect(() => {
+    setGuest(bookingData.guestDetails || {});
+  }, []); // run only once on mount
+
   const handleGuestDetailsChange = (field, value) => {
+    setGuest((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const handleFieldBlur = () => {
     setBookingData((prev) => ({
       ...prev,
-      guestDetails: { ...prev.guestDetails, [field]: value },
+      guestDetails: { ...prev.guestDetails, ...guest },
     }));
   };
 
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!guest.firstName?.trim())
+      newErrors.firstName = "First name is required";
+    if (!guest.lastName?.trim()) newErrors.lastName = "Last name is required";
+    if (!guest.email?.trim()) newErrors.email = "Email is required";
+    else if (!validateEmail(guest.email))
+      newErrors.email = "Please enter a valid email address";
+    if (!guest.phone?.trim()) newErrors.phone = "Phone number is required";
+    if (!guest.address?.trim()) newErrors.address = "Address is required";
+    if (!guest.city?.trim()) newErrors.city = "City is required";
+    if (!guest.country?.trim()) newErrors.country = "Country is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateForm()) {
+      handleFieldBlur();
+      onNext();
+    }
+  };
+
+  const isFormValid = () =>
+    guest.firstName &&
+    guest.lastName &&
+    guest.email &&
+    guest.phone &&
+    guest.address &&
+    guest.city &&
+    guest.country;
+
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">Guest Details</h2>
-        <p className="text-gray-600">Please provide your contact information</p>
+    <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      {/* Header */}
+      <div className="text-center mb-10">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl mb-4">
+          <User className="w-8 h-8 text-white" />
+        </div>
+        <h2 className="text-3xl font-bold text-slate-800 mb-2">
+          Guest Information
+        </h2>
+        <p className="text-slate-600 text-lg">
+          Please provide your details for the reservation
+        </p>
       </div>
 
-      <div className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-4">
+      {/* Form */}
+      <div className="space-y-8">
+        {/* Personal Information */}
+        <div>
+          <h3 className="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
+            <User className="w-5 h-5 text-amber-500" /> Personal Information
+          </h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* First Name */}
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <User className="w-4 h-4 text-slate-500" /> First Name{" "}
+                <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your first name"
+                className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+                value={guest.firstName || ""}
+                onChange={(e) =>
+                  handleGuestDetailsChange("firstName", e.target.value)
+                }
+                onBlur={handleFieldBlur}
+              />
+              {errors.firstName && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" /> {errors.firstName}
+                </p>
+              )}
+            </div>
+
+            {/* Last Name */}
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <User className="w-4 h-4 text-slate-500" /> Last Name{" "}
+                <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your last name"
+                className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+                value={guest.lastName || ""}
+                onChange={(e) =>
+                  handleGuestDetailsChange("lastName", e.target.value)
+                }
+                onBlur={handleFieldBlur}
+              />
+              {errors.lastName && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" /> {errors.lastName}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        <div>
+          <h3 className="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
+            <Mail className="w-5 h-5 text-amber-500" /> Contact Information
+          </h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Email */}
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <Mail className="w-4 h-4 text-slate-500" /> Email Address{" "}
+                <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                placeholder="your.email@example.com"
+                className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+                value={guest.email || ""}
+                onChange={(e) =>
+                  handleGuestDetailsChange("email", e.target.value)
+                }
+                onBlur={handleFieldBlur}
+              />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" /> {errors.email}
+                </p>
+              )}
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <Phone className="w-4 h-4 text-slate-500" /> Phone Number{" "}
+                <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="tel"
+                placeholder="+1 (555) 123-4567"
+                className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+                value={guest.phone || ""}
+                onChange={(e) =>
+                  handleGuestDetailsChange("phone", e.target.value)
+                }
+                onBlur={handleFieldBlur}
+              />
+              {errors.phone && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" /> {errors.phone}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Address Information */}
+        <div>
+          <h3 className="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-amber-500" /> Address Information
+          </h3>
+          {/* Street */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              First Name
+            <label className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-slate-500" /> Street Address{" "}
+              <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-              value={bookingData.guestDetails.firstName}
+              placeholder="123 Main Street, Apt 4B"
+              className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+              value={guest.address || ""}
               onChange={(e) =>
-                handleGuestDetailsChange("firstName", e.target.value)
+                handleGuestDetailsChange("address", e.target.value)
               }
+              onBlur={handleFieldBlur}
             />
+            {errors.address && (
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" /> {errors.address}
+              </p>
+            )}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Last Name
+
+          {/* City, State, Country */}
+          <div className="grid md:grid-cols-3 gap-6 mt-4">
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-2">
+                City <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="New York"
+                className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+                value={guest.city || ""}
+                onChange={(e) =>
+                  handleGuestDetailsChange("city", e.target.value)
+                }
+                onBlur={handleFieldBlur}
+              />
+              {errors.city && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" /> {errors.city}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-2">
+                State/Province
+              </label>
+              <input
+                type="text"
+                placeholder="NY"
+                className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+                value={guest.state || ""}
+                onChange={(e) =>
+                  handleGuestDetailsChange("state", e.target.value)
+                }
+                onBlur={handleFieldBlur}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-2">
+                Country <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="United States"
+                className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+                value={guest.country || ""}
+                onChange={(e) =>
+                  handleGuestDetailsChange("country", e.target.value)
+                }
+                onBlur={handleFieldBlur}
+              />
+              {errors.country && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" /> {errors.country}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Postal */}
+          <div className="mt-4">
+            <label className="text-sm font-semibold text-slate-700 mb-2">
+              Postal/ZIP Code
             </label>
             <input
               type="text"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-              value={bookingData.guestDetails.lastName}
+              placeholder="10001"
+              className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+              value={guest.postalCode || ""}
               onChange={(e) =>
-                handleGuestDetailsChange("lastName", e.target.value)
+                handleGuestDetailsChange("postalCode", e.target.value)
               }
+              onBlur={handleFieldBlur}
             />
           </div>
         </div>
+
+        {/* Additional Information */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Email
-          </label>
-          <input
-            type="email"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-            value={bookingData.guestDetails.email}
-            onChange={(e) => handleGuestDetailsChange("email", e.target.value)}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Phone
-          </label>
-          <input
-            type="tel"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-            value={bookingData.guestDetails.phone}
-            onChange={(e) => handleGuestDetailsChange("phone", e.target.value)}
-          />
+          <h3 className="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
+            <Users className="w-5 h-5 text-amber-500" /> Additional Information
+          </h3>
+
+          {/* DOB */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-2">
+                Date of Birth
+              </label>
+              <input
+                type="date"
+                className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+                value={guest.dateOfBirth || ""}
+                onChange={(e) =>
+                  handleGuestDetailsChange("dateOfBirth", e.target.value)
+                }
+                onBlur={handleFieldBlur}
+              />
+            </div>
+
+            {/* Gender */}
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-2">
+                Gender
+              </label>
+              <select
+                className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+                value={guest.gender || ""}
+                onChange={(e) =>
+                  handleGuestDetailsChange("gender", e.target.value)
+                }
+                onBlur={handleFieldBlur}
+              >
+                <option value="">Select gender (optional)</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Special Requests */}
+          <div className="mt-6">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Special Requests or Dietary Requirements
+            </label>
+            <textarea
+              rows={4}
+              placeholder="Please let us know about any special requests, dietary requirements, accessibility needs, or other preferences..."
+              className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none resize-none"
+              value={guest.specialRequests || ""}
+              onChange={(e) =>
+                handleGuestDetailsChange("specialRequests", e.target.value)
+              }
+              onBlur={handleFieldBlur}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="mt-8 flex justify-between">
+      {/* Navigation */}
+      <div className="mt-12 flex justify-between items-center">
         <button
           onClick={onPrev}
-          className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 flex items-center"
+          className="flex items-center gap-2 px-8 py-4 rounded-xl border-2 border-slate-300 text-slate-600 font-semibold hover:border-slate-400 hover:text-slate-700 transition-all duration-200 hover:shadow-lg"
         >
-          <ArrowLeft className="mr-2 w-4 h-4" />
-          Back
+          <ArrowLeft className="w-5 h-5" /> Back
         </button>
         <button
-          onClick={onNext}
-          disabled={
-            !bookingData.guestDetails.firstName ||
-            !bookingData.guestDetails.lastName ||
-            !bookingData.guestDetails.email ||
-            !bookingData.guestDetails.phone
-          }
-          className="bg-amber-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-amber-700 flex items-center"
+          onClick={handleNext}
+          disabled={!isFormValid()}
+          className="flex items-center gap-2 px-10 py-4 rounded-xl bg-amber-500 text-white font-semibold disabled:opacity-50 transition-all duration-200"
         >
-          Continue
-          <ArrowRight className="ml-2 w-4 h-4" />
+          Continue <ArrowRight className="w-5 h-5" />
         </button>
       </div>
     </div>

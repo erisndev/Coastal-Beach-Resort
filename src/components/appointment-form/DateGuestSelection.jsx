@@ -179,13 +179,14 @@
 import React, { useState } from "react";
 import { Calendar, Users, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { checkRoomAvailability } from "../../API/Api";
 
 export const DateGuestSelection = ({
-  bookingData,
-  setBookingData,
-  onNext,
-  rooms, // use rooms from props
-  setRooms,
+bookingData,
+setBookingData,
+onNext,
+setRooms,
+setAvailableUnits, // Store full list of available units
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -197,32 +198,111 @@ export const DateGuestSelection = ({
     setBookingData((prev) => ({ ...prev, [field]: parseInt(value) || 0 }));
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!bookingData.checkIn || !bookingData.checkOut) {
       alert("Please select check-in and check-out dates.");
       return;
     }
 
+    // reset selection on new search
+    setBookingData((prev) => ({ ...prev, selectedRoom: null }));
     setLoading(true);
-    setTimeout(() => {
-      const guestCount = bookingData.adults + bookingData.children;
+    try {
+      const guests = (parseInt(bookingData.adults, 10) || 0) + (parseInt(bookingData.children, 10) || 0);
 
-      // Filter rooms passed from Appointment.jsx
-      const availableRooms = rooms.filter(
-        (room) => room.capacity >= guestCount
+      const available = await checkRoomAvailability(
+        null,
+        bookingData.checkIn,
+        bookingData.checkOut,
+        guests
       );
 
-      if (availableRooms.length === 0) {
-        toast.warn("No rooms available for selected dates and guests.");
-        setRooms([]);
-      } else {
-        setRooms(availableRooms);
-        toast.success("Rooms found!");
-        onNext();
+      // Normalize API response to an array
+      const list = Array.isArray(available)
+        ? available
+        : Array.isArray(available?.data)
+        ? available.data
+        : Array.isArray(available?.results)
+        ? available.results
+        : Array.isArray(available?.roomTypes)
+        ? available.roomTypes
+        : Array.isArray(available?.rooms)
+        ? available.rooms
+        : [];
+
+      // Store the full list of available units for booking
+      setAvailableUnits(list);
+
+      // Group units by room type for display
+      const byType = new Map();
+      list.forEach((r) => {
+        const typeId = r.roomTypeId || r.roomType?._id || r.typeId || r.roomType || r._id;
+        const key = String(typeId);
+        const existing = byType.get(key);
+        const name = r.roomType?.name || r.name || "Room";
+        const capacity = r.roomType?.capacity ?? r.capacity ?? 0;
+        const price = r.roomType?.pricePerNight ?? r.pricePerNight ?? r.price ?? 0;
+        const description = r.roomType?.description || r.description || "";
+        const amenities = r.roomType?.amenities || r.amenities || [];
+        const totalUnits = r.roomType?.totalUnits ?? r.totalUnits;
+        
+        if (existing) {
+          existing.availableUnits = (existing.availableUnits || 1) + 1;
+          // Store available unit IDs for this type
+          if (!existing.unitIds) existing.unitIds = [];
+          existing.unitIds.push(r._id);
+          // keep the lowest price as representative if prices differ
+          if (price && price < existing.price) existing.price = price;
+        } else {
+          byType.set(key, {
+            _id: key, // room type ID
+            roomTypeId: typeId,
+            name,
+            capacity,
+            price,
+            description,
+            amenities,
+            totalUnits,
+            availableUnits: 1,
+            unitIds: [r._id], // Available unit IDs for this type
+          });
+        }
+      });
+
+      let formattedRooms = Array.from(byType.values());
+
+      // Fallback: if grouping produced nothing but list has entries, map directly
+      if (!formattedRooms.length && list.length) {
+        formattedRooms = list.map((r) => ({
+          _id: String(r.roomTypeId || r._id),
+          roomTypeId: r.roomTypeId || r.roomType?._id || r._id,
+          name: r.roomType?.name || r.name || "Room",
+          capacity: r.roomType?.capacity ?? r.capacity ?? 0,
+          price: r.roomType?.pricePerNight ?? r.pricePerNight ?? r.price ?? 0,
+          description: r.roomType?.description || r.description || "",
+          amenities: r.roomType?.amenities || r.amenities || [],
+          totalUnits: r.roomType?.totalUnits ?? r.totalUnits,
+          availableUnits: 1,
+          unitIds: [r._id],
+        }));
       }
 
+      if (!formattedRooms.length) {
+        toast.warn("No rooms available for selected dates and guests.");
+        setRooms([]);
+        setAvailableUnits([]);
+        return;
+      }
+
+      setRooms(formattedRooms);
+      toast.success("Rooms found!");
+      onNext();
+    } catch (err) {
+      console.error("Error searching rooms:", err);
+      toast.error("Unable to search rooms. Please try again.");
+    } finally {
       setLoading(false);
-    }, 500); // small delay to mimic API loading
+    }
   };
 
   return (

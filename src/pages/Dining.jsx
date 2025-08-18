@@ -227,64 +227,6 @@ export const Dining = () => {
             ))}
           </div>
         </section>
-
-        {/* Property Surroundings */}
-        <section className="py-20">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-light text-slate-800 mb-4 tracking-wide">
-              Property Surroundings
-            </h2>
-            <div className="w-16 h-px bg-amber-600 mx-auto"></div>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg p-12">
-              <p className="text-amber-600 text-lg mb-12 text-center font-light">
-                Guests loved walking around the neighbourhood! Good location
-              </p>
-
-              <div className="grid md:grid-cols-1 gap-8">
-                <div>
-                  <h3 className="text-2xl font-light text-slate-800 mb-8 tracking-wide">
-                    Restaurants & Cafes
-                  </h3>
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between py-4 border-b border-slate-100">
-                      <div>
-                        <span className="text-amber-600 font-light tracking-wide">
-                          Restaurant
-                        </span>
-                        <span className="text-slate-800 font-light ml-4">
-                          Crows Nest Restaurant
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between py-4 border-b border-slate-100">
-                      <div>
-                        <span className="text-amber-600 font-light tracking-wide">
-                          Restaurant
-                        </span>
-                        <span className="text-slate-800 font-light ml-4">
-                          KFC
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between py-4 border-b border-slate-100">
-                      <div>
-                        <span className="text-amber-600 font-light tracking-wide">
-                          Restaurant
-                        </span>
-                        <span className="text-slate-800 font-light ml-4">
-                          Sebastians Seafood Grill & Pub
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
   );
