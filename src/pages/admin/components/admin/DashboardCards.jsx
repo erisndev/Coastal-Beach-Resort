@@ -1,46 +1,86 @@
 import React, { useEffect, useState } from "react";
-import { Users, Bed, CreditCard, BarChart2 } from "lucide-react";
-import { fetchBookings } from "../../../../API/Api"; // import your API helper
+import { Users, Bed, CreditCard, List, BarChart2 } from "lucide-react";
+import { fetchBookings, fetchRoomTypes } from "../../../../API/Api";
 
 const DashboardCards = () => {
   const [data, setData] = useState({
     totalGuests: 0,
     roomsBooked: 0,
     paymentsReceived: 0,
-    analyticsViews: 0,
+    totalBookings: 0,
+    occupancyRate: 0,
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getBookingsData = async () => {
+    const getDashboardData = async () => {
       try {
-        const bookings = await fetchBookings();
+        const [bookings, roomTypes] = await Promise.all([
+          fetchBookings(),
+          fetchRoomTypes(),
+        ]);
 
-        const totalGuests = bookings.reduce(
-          (acc, b) => acc + b.guests.adults + b.guests.children,
+        const activeBookings = bookings.filter((b) => b.status !== "cancelled");
+
+        // Total Guests
+        const totalGuests = activeBookings.reduce(
+          (acc, b) => acc + (Number(b.guests) || 0),
           0
         );
 
-        const roomsBooked = bookings.filter((b) => b.status === "paid").length;
+        // Rooms Occupied Today
+        const roomsBookedToday = activeBookings.reduce((acc, b) => {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const checkIn = new Date(b.checkIn);
+          const checkOut = new Date(b.checkOut);
+          checkIn.setHours(0, 0, 0, 0);
+          checkOut.setHours(0, 0, 0, 0);
 
-        const paymentsReceived = bookings
-          .filter((b) => b.payment.status === "paid")
-          .reduce((acc, b) => acc + b.totalPrice, 0);
+          if (today >= checkIn && today <= checkOut) {
+            // Count number of rooms in booking
+            if (b.rooms && Array.isArray(b.rooms)) return acc + b.rooms.length;
+            if (b.roomCount) return acc + b.roomCount;
+            return acc + 1; // fallback if single room
+          }
+          return acc;
+        }, 0);
+
+        // Total Rooms in Resort
+        const totalRooms = roomTypes.reduce(
+          (acc, rt) => acc + (rt.quantity || 0),
+          0
+        );
+
+        // Occupancy Rate
+        const occupancyRate =
+          totalRooms > 0
+            ? Math.round((roomsBookedToday / totalRooms) * 100)
+            : 0;
+
+        // Payments Received
+        const paymentsReceived = activeBookings
+          .filter((b) => b.payment?.status === "paid")
+          .reduce((acc, b) => acc + (b.totalPrice || 0), 0);
+
+        // Total Bookings
+        const totalBookings = activeBookings.length;
 
         setData({
           totalGuests,
-          roomsBooked,
+          roomsBooked: roomsBookedToday,
           paymentsReceived,
-          analyticsViews: 3500,
+          totalBookings,
+          occupancyRate,
         });
       } catch (err) {
-        console.error("Error fetching dashboard bookings:", err);
+        console.error("Error fetching dashboard data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    getBookingsData();
+    getDashboardData();
   }, []);
 
   if (loading) return <p>Loading dashboard data...</p>;
@@ -54,7 +94,7 @@ const DashboardCards = () => {
     },
     {
       id: 2,
-      title: "Rooms Booked",
+      title: "Rooms Occupied Today",
       value: data.roomsBooked,
       icon: <Bed size={24} />,
     },
@@ -66,14 +106,20 @@ const DashboardCards = () => {
     },
     {
       id: 4,
-      title: "Analytics Views",
-      value: data.analyticsViews,
+      title: "Total Bookings",
+      value: data.totalBookings,
+      icon: <List size={24} />,
+    },
+    {
+      id: 5,
+      title: "Occupancy Rate",
+      value: `${data.occupancyRate}%`,
       icon: <BarChart2 size={24} />,
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
       {cards.map((card) => (
         <div
           key={card.id}

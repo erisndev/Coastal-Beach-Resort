@@ -1,98 +1,3 @@
-// import React, { useState } from "react";
-// import { ArrowLeft, Loader2 } from "lucide-react";
-// import { createBooking } from "../../API/Api";
-// import { toast } from "react-toastify";
-
-// export const BookingConfirmation = ({ bookingData, onPrev, onNext }) => {
-//   const [loading, setLoading] = useState(false);
-
-//   const handleConfirm = async () => {
-//     setLoading(true);
-//     try {
-//       const response = await createBooking({
-//         roomId: bookingData.selectedRoom._id,
-//         checkIn: bookingData.checkIn,
-//         checkOut: bookingData.checkOut,
-//         guests: bookingData.adults + bookingData.children,
-//         guestDetails: bookingData.guestDetails,
-//         totalPrice: bookingData.selectedRoom.price, // optionally calculate nights * price
-//       });
-
-//       toast.success("Booking successful!  " + response._id);
-
-//       // Move to next step (Payment or Receipt)
-//       onNext();
-//     } catch (error) {
-//       console.error("Booking failed:", error);
-//       alert("Booking failed. Please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
-//       <div className="text-center mb-8">
-//         <h2 className="text-3xl font-bold text-gray-800 mb-2">
-//           Confirm Your Booking
-//         </h2>
-//         <p className="text-gray-600">
-//           Review your booking details before confirming
-//         </p>
-//       </div>
-
-//       <div className="space-y-4">
-//         <p>
-//           <strong>Check-in:</strong> {bookingData.checkIn}
-//         </p>
-//         <p>
-//           <strong>Check-out:</strong> {bookingData.checkOut}
-//         </p>
-//         <p>
-//           <strong>Guests:</strong> {bookingData.adults} Adults,{" "}
-//           {bookingData.children} Children
-//         </p>
-//         <p>
-//           <strong>Room:</strong> {bookingData.selectedRoom.name}
-//         </p>
-//         <p>
-//           <strong>Price per night:</strong> R{bookingData.selectedRoom.price}
-//         </p>
-//         <p>
-//           <strong>Guest:</strong> {bookingData.guestDetails.firstName}{" "}
-//           {bookingData.guestDetails.lastName}
-//         </p>
-//         <p>
-//           <strong>Email:</strong> {bookingData.guestDetails.email}
-//         </p>
-//         <p>
-//           <strong>Phone:</strong> {bookingData.guestDetails.phone}
-//         </p>
-//       </div>
-
-//       <div className="mt-8 flex justify-between">
-//         <button
-//           onClick={onPrev}
-//           className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 flex items-center"
-//         >
-//           <ArrowLeft className="mr-2 w-4 h-4" />
-//           Back
-//         </button>
-//         <button
-//           onClick={handleConfirm}
-//           disabled={loading}
-//           className="bg-amber-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-amber-700 flex items-center"
-//         >
-//           {loading ? (
-//             <Loader2 className="animate-spin w-4 h-4 mr-2" />
-//           ) : (
-//             "Confirm Booking & Proceed"
-//           )}
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
 import React, { useState } from "react";
 import {
   ArrowLeft,
@@ -110,6 +15,7 @@ import { createBooking } from "../../API/Api";
 
 export const BookingConfirmation = ({
   bookingData,
+  setBookingData,
   onPrev,
   onNext,
   calculateNights,
@@ -117,30 +23,58 @@ export const BookingConfirmation = ({
   setAvailableUnits,
 }) => {
   const [loading, setLoading] = useState(false);
+  const guestList = {
+    adults: parseInt(bookingData.adults, 10) || 0,
+    children: parseInt(bookingData.children, 10) || 0,
+  };
 
   const handleConfirm = async () => {
     setLoading(true);
     try {
+      // Clean guestDetails by removing empty fields
+      const guestDetails = { ...bookingData.guestDetails };
+      Object.keys(guestDetails).forEach((key) => {
+        if (!guestDetails[key]) delete guestDetails[key];
+      });
+
+      // Ensure guestList is always present and correct
+      const guestList = {
+        adults: parseInt(bookingData.adults, 10) || 0,
+        children: parseInt(bookingData.children, 10) || 0,
+      };
+
       const payload = {
-        roomId: bookingData.selectedRoom.selectedRoomId || bookingData.selectedRoom._id,
+        roomId:
+          bookingData.selectedRoom.selectedRoomId ||
+          bookingData.selectedRoom._id,
         checkIn: bookingData.checkIn,
         checkOut: bookingData.checkOut,
-        guests:
-          (parseInt(bookingData.adults, 10) || 0) +
-          (parseInt(bookingData.children, 10) || 0),
-        guestDetails: bookingData.guestDetails,
+        guests: guestList.adults + guestList.children, // total guests
+        guestList, // send full guest breakdown
+        guestDetails,
         totalPrice: calculateTotal(),
       };
-      console.log("Booking payload:", payload);
+
+      console.log("Sanitized booking payload:", payload);
+
       const response = await createBooking(payload);
-      toast.success("Booking successful! " + (response._id || ""));
-      
-      // Refresh availability to remove the booked unit from available list
-      setAvailableUnits(prev => 
-        prev.filter(unit => unit._id !== payload.roomId)
+
+      // Save booking and payment reference
+      setBookingData((prev) => ({
+        ...prev,
+        bookingId: response.booking._id,
+        paymentReference: response.booking.payment.reference,
+      }));
+
+      toast.success("Booking created! Proceed to payment.");
+      console.log("Payment reference:", response.booking.payment.reference);
+
+      // Remove booked unit from availability
+      setAvailableUnits((prev) =>
+        prev.filter((unit) => unit._id !== payload.roomId)
       );
-      
-      onNext();
+
+      onNext(); // proceed to payment
     } catch (error) {
       console.error("Booking failed:", error);
       toast.error(error.message || "Booking failed. Please try again.");
@@ -164,7 +98,7 @@ export const BookingConfirmation = ({
         </p>
       </div>
 
-      {/* Booking Details Grid */}
+      {/* Booking Details */}
       <div className="grid md:grid-cols-2 gap-8 mb-8">
         {/* Stay Details */}
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
@@ -210,20 +144,20 @@ export const BookingConfirmation = ({
             <div className="flex justify-between">
               <span className="text-slate-600">Adults:</span>
               <span className="font-semibold text-slate-800">
-                {bookingData.adults}
+                {guestList.adults}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">Children:</span>
               <span className="font-semibold text-slate-800">
-                {bookingData.children}
+                {guestList.children}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Guest Information */}
+      {/* Guest Info */}
       <div className="bg-gradient-to-br from-amber-50 to-orange-100 rounded-xl p-6 border border-amber-200 mb-8">
         <div className="flex items-center gap-3 mb-6">
           <User className="w-6 h-6 text-amber-600" />
@@ -233,54 +167,36 @@ export const BookingConfirmation = ({
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Personal Details */}
           <div className="space-y-3">
             <h4 className="font-semibold text-slate-700 mb-3">
               Personal Details
             </h4>
-            <div className="flex items-center gap-3">
-              <User className="w-4 h-4 text-slate-500" />
-              <span className="text-slate-600">Name:</span>
-              <span className="font-semibold text-slate-800">
-                {bookingData.guestDetails.firstName}{" "}
-                {bookingData.guestDetails.lastName}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Mail className="w-4 h-4 text-slate-500" />
-              <span className="text-slate-600">Email:</span>
-              <span className="font-semibold text-slate-800">
-                {bookingData.guestDetails.email}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Phone className="w-4 h-4 text-slate-500" />
-              <span className="text-slate-600">Phone:</span>
-              <span className="font-semibold text-slate-800">
-                {bookingData.guestDetails.phone}
-              </span>
-            </div>
-            {bookingData.guestDetails.dateOfBirth && (
-              <div className="flex items-center gap-3">
-                <Calendar className="w-4 h-4 text-slate-500" />
-                <span className="text-slate-600">Date of Birth:</span>
-                <span className="font-semibold text-slate-800">
-                  {bookingData.guestDetails.dateOfBirth}
-                </span>
-              </div>
-            )}
-            {bookingData.guestDetails.gender && (
-              <div className="flex items-center gap-3">
-                <Users className="w-4 h-4 text-slate-500" />
-                <span className="text-slate-600">Gender:</span>
-                <span className="font-semibold text-slate-800">
-                  {bookingData.guestDetails.gender}
-                </span>
-              </div>
+            {[
+              "firstName",
+              "lastName",
+              "email",
+              "phone",
+              "dateOfBirth",
+              "gender",
+            ].map((field) =>
+              bookingData.guestDetails[field] ? (
+                <div key={field} className="flex items-center gap-3">
+                  {field === "email" ? (
+                    <Mail className="w-4 h-4 text-slate-500" />
+                  ) : (
+                    <User className="w-4 h-4 text-slate-500" />
+                  )}
+                  <span className="text-slate-600">
+                    {field.charAt(0).toUpperCase() + field.slice(1)}:
+                  </span>
+                  <span className="font-semibold text-slate-800">
+                    {bookingData.guestDetails[field]}
+                  </span>
+                </div>
+              ) : null
             )}
           </div>
 
-          {/* Address Details */}
           <div className="space-y-3">
             <h4 className="font-semibold text-slate-700 mb-3">Address</h4>
             <div className="flex items-start gap-3">
@@ -304,7 +220,6 @@ export const BookingConfirmation = ({
           </div>
         </div>
 
-        {/* Special Requests */}
         {bookingData.guestDetails.specialRequests && (
           <div className="mt-6 p-4 bg-white rounded-lg border border-amber-200">
             <h4 className="font-semibold text-slate-700 mb-2">
@@ -317,7 +232,7 @@ export const BookingConfirmation = ({
         )}
       </div>
 
-      {/* Pricing Summary */}
+      {/* Pricing */}
       <div className="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-6 border border-green-200 mb-8">
         <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
           💰 Pricing Summary

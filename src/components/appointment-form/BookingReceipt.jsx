@@ -10,8 +10,11 @@ export const BookingReceipt = ({
 }) => {
   const receiptRef = useRef(null);
 
-  const bookingId =
-    "RB" + Math.random().toString(36).substr(2, 9).toUpperCase();
+  // Use backend payment reference if available, else generate random ID
+  const bookingId = bookingData._id
+    ? "RB" + bookingData._id.slice(-6).toUpperCase() // optional: short version
+    : "RB" + Math.random().toString(36).substr(2, 9).toUpperCase();
+
   const nights = calculateNights();
   const pricePerNight = bookingData.selectedRoom?.price || 0;
   const total = calculateTotal();
@@ -102,6 +105,28 @@ export const BookingReceipt = ({
                   R{pricePerNight.toLocaleString()}
                 </span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Payment Status:</span>
+                <span
+                  className={`font-semibold ${
+                    bookingData.payment?.status === "paid"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {bookingData.payment?.status === "paid"
+                    ? "Paid ✅"
+                    : "Pending ⚠️"}
+                </span>
+              </div>
+              {bookingData.payment?.transaction && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Transaction ID:</span>
+                  <span className="font-medium">
+                    {bookingData.payment.transaction}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between pt-2 border-t">
                 <span className="text-gray-700 font-semibold">Total:</span>
                 <span className="font-extrabold text-amber-600 text-xl">

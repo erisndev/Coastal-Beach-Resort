@@ -10,6 +10,7 @@ import {
   ChevronRight,
   House,
   LayoutDashboard,
+  Calendar,
 } from "lucide-react";
 
 const Sidebar = ({ darkMode }) => {
@@ -24,6 +25,11 @@ const Sidebar = ({ darkMode }) => {
       name: "Payments",
       path: "/admin/payments",
       icon: <CreditCard size={20} />,
+    },
+    {
+      name: "Calendar",
+      path: "/admin/calendar",
+      icon: <Calendar size={20} />,
     },
   ];
 

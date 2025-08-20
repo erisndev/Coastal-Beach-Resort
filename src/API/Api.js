@@ -128,11 +128,11 @@ export const fetchBookings = async () => {
   return await res.json();
 };
 
-export const createBooking = async (bookingData) => {
+export const createBooking = async (booking) => {
   const res = await fetch(`${API_BASE}/bookings`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(bookingData),
+    body: JSON.stringify(booking),
   });
   if (!res.ok) {
     const err = await res.json();
@@ -172,6 +172,27 @@ export const verifyPayment = async (reference) => {
   if (!res.ok) {
     const err = await res.json();
     throw new Error(err.message || "Payment verification failed");
+  }
+  return await res.json();
+};
+
+// ===== Booking (Single) API =====
+export const fetchBookingById = async (id) => {
+  const res = await fetch(`${API_BASE}/bookings/${id}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Failed to fetch booking by ID");
+  }
+  return await res.json();
+};
+
+export const fetchBookingByReference = async (reference) => {
+  const res = await fetch(`${API_BASE}/bookings/ref/${reference}`);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Failed to fetch booking by reference");
   }
   return await res.json();
 };
