@@ -196,3 +196,28 @@ export const fetchBookingByReference = async (reference) => {
   }
   return await res.json();
 };
+
+// ===== NEW: Check-In / Check-Out API =====
+export const checkInBooking = async (bookingId) => {
+  const res = await fetch(`${API_BASE}/bookings/check-in/${bookingId}`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Failed to check in booking");
+  }
+  return await res.json();
+};
+
+export const checkOutBooking = async (bookingId) => {
+  const res = await fetch(`${API_BASE}/bookings/check-out/${bookingId}`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Failed to check out booking");
+  }
+  return await res.json();
+};

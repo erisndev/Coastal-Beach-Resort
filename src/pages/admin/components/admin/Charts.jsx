@@ -18,7 +18,8 @@ import { fetchBookings, fetchRoomTypes } from "../../../../API/Api";
 
 const Charts = () => {
   const [weeklyData, setWeeklyData] = useState([]);
-  const [monthlyData, setMonthlyData] = useState([]);
+  const [monthlyRevenueData, setMonthlyRevenueData] = useState([]);
+  const [monthlyGuestsData, setMonthlyGuestsData] = useState([]);
   const [roomTypeData, setRoomTypeData] = useState([]);
   const [statusData, setStatusData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,9 +30,10 @@ const Charts = () => {
         const bookings = await fetchBookings();
         const roomTypes = await fetchRoomTypes();
 
-        // Weekly aggregation
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const now = new Date();
+
+        // --- Weekly Data ---
         const last7Days = Array.from({ length: 7 })
           .map((_, i) => {
             const d = new Date();
@@ -51,7 +53,7 @@ const Charts = () => {
         });
         setWeeklyData(last7Days);
 
-        // Monthly aggregation (last 6 months)
+        // --- Monthly Revenue & Guests (last 6 months) ---
         const months = [
           "Jan",
           "Feb",
@@ -66,11 +68,17 @@ const Charts = () => {
           "Nov",
           "Dec",
         ];
+
         const last6Months = Array.from({ length: 6 })
           .map((_, i) => {
             const d = new Date();
             d.setMonth(now.getMonth() - i);
-            return { month: months[d.getMonth()], revenue: 0 };
+            return {
+              month: months[d.getMonth()],
+              revenue: 0,
+              adults: 0,
+              children: 0,
+            };
           })
           .reverse();
 
@@ -79,12 +87,16 @@ const Charts = () => {
           last6Months.forEach((m) => {
             if (checkIn.getMonth() === months.indexOf(m.month)) {
               m.revenue += b.totalPrice;
+              m.adults += b.guestList?.adults || b.adults || 0;
+              m.children += b.guestList?.children || b.children || 0;
             }
           });
         });
-        setMonthlyData(last6Months);
 
-        // Pie chart: Room type distribution
+        setMonthlyRevenueData(last6Months);
+        setMonthlyGuestsData(last6Months);
+
+        // --- Room Type Distribution ---
         const roomTypeCount = roomTypes.map((rt) => {
           const count = bookings.filter(
             (b) =>
@@ -94,7 +106,7 @@ const Charts = () => {
         });
         setRoomTypeData(roomTypeCount);
 
-        // Pie chart: Booking status distribution
+        // --- Booking Status Distribution ---
         const statusCount = [
           "confirmed",
           "checked-in",
@@ -102,11 +114,11 @@ const Charts = () => {
           "cancelled",
         ].map((status) => {
           const count = bookings.filter((b) => {
-            if (b.status === "cancelled") return status === "cancelled";
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
             const checkIn = new Date(b.checkIn);
             const checkOut = new Date(b.checkOut);
-            today.setHours(0, 0, 0, 0);
             checkIn.setHours(0, 0, 0, 0);
             checkOut.setHours(0, 0, 0, 0);
 
@@ -114,6 +126,7 @@ const Charts = () => {
             if (status === "checked-in")
               return checkIn <= today && checkOut >= today;
             if (status === "confirmed") return checkIn > today;
+            if (status === "cancelled") return b.status === "cancelled";
             return false;
           }).length;
           return { name: status, value: count };
@@ -125,16 +138,17 @@ const Charts = () => {
         setLoading(false);
       }
     };
+
     loadData();
   }, []);
 
   if (loading) return <p>Loading charts...</p>;
 
-  const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]; // Blue, Green, Yellow, Red
+  const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
   return (
     <div className="space-y-8 p-6">
-      {/* Weekly Composed Chart */}
+      {/* Weekly Chart */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
         <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
           Weekly Performance
@@ -177,7 +191,7 @@ const Charts = () => {
           Monthly Revenue
         </h2>
         <ResponsiveContainer width="100%" height={400}>
-          <AreaChart data={monthlyData}>
+          <AreaChart data={monthlyRevenueData}>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="#374151"
@@ -197,9 +211,31 @@ const Charts = () => {
         </ResponsiveContainer>
       </div>
 
+      {/* Monthly Guests (Adults & Children) Bar Chart */}
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+          Monthly Guests (Adults & Children)
+        </h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <ComposedChart data={monthlyGuestsData}>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#374151"
+              opacity={0.3}
+            />
+            <XAxis dataKey="month" stroke="#9CA3AF" />
+            <YAxis stroke="#9CA3AF" />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="adults" fill="#3b82f6" name="Adults" />
+            <Bar dataKey="children" fill="#f59e0b" name="Children" />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+
       {/* Pie Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Room Type Distribution */}
+        {/* Room Type */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
           <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
             Room Type Distribution
@@ -228,7 +264,7 @@ const Charts = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Booking Status Distribution */}
+        {/* Booking Status */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
           <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
             Booking Status Distribution

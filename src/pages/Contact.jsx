@@ -362,7 +362,7 @@ export const Contact = () => {
                   onValueChange={(value) => handleInputChange("reason", value)}
                 >
                   <SelectTrigger
-                    className={`border-slate-200 rounded-xl h-12 focus:ring-amber-500 focus:border-amber-500 transition-all duration-300 ${
+                    className={`w-full border-slate-200 rounded-xl h-12 focus:ring-amber-500 focus:border-amber-500 transition-all duration-300 ${
                       errors.reason ? "border-red-300 focus:ring-red-500" : ""
                     }`}
                   >

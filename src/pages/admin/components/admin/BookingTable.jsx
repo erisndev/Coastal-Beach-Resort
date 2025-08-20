@@ -1,18 +1,132 @@
 import React, { useEffect, useState } from "react";
-import { Search, Filter, X, User } from "lucide-react";
+import { Search, Filter, X, MoreVertical } from "lucide-react";
+import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
 import {
   fetchBookings,
   fetchRoomTypes,
   cancelBooking,
+  checkInBooking,
+  checkOutBooking,
 } from "../../../../API/Api";
+
+const ActionsDropdown = ({
+  booking,
+  processingId,
+  handleCheckIn,
+  handleCheckOut,
+  handleCancelBooking,
+  onViewBooking,
+}) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const checkInDate = new Date(booking.checkIn);
+  const checkOutDate = new Date(booking.checkOut);
+  checkInDate.setHours(0, 0, 0, 0);
+  checkOutDate.setHours(0, 0, 0, 0);
+
+  const canCheckIn = booking.bookingStatus.status === "confirmed";
+  const canCheckOut = booking.bookingStatus.status === "checked-in";
+  const canCancel = booking.status !== "cancelled";
+
+  const isCheckInToday = today.getTime() === checkInDate.getTime();
+  const isCheckOutToday = today.getTime() === checkOutDate.getTime();
+
+  return (
+    <Menu as="div" className="relative inline-block text-left">
+      <MenuButton className="inline-flex justify-center items-center w-8 h-8 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+        <MoreVertical className="w-4 h-4" />
+      </MenuButton>
+      <MenuItems className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-gray-800 shadow-xl rounded-lg border border-gray-200 dark:border-gray-700 z-[9999] py-1 origin-top-right">
+        {/* View Booking Button */}
+        {onViewBooking && (
+          <MenuItem>
+            {({ active }) => (
+              <button
+                onClick={() => onViewBooking(booking._id)}
+                className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                  active
+                    ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    : "text-gray-700 dark:text-gray-300"
+                }`}
+              >
+                View Details
+              </button>
+            )}
+          </MenuItem>
+        )}
+
+        {canCheckIn && (
+          <MenuItem>
+            {({ active }) => (
+              <button
+                disabled={processingId === booking._id || !isCheckInToday}
+                onClick={() => handleCheckIn(booking._id)}
+                className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                  processingId === booking._id || !isCheckInToday
+                    ? "text-gray-400 cursor-not-allowed"
+                    : active
+                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400"
+                    : "text-blue-600 dark:text-blue-400"
+                }`}
+              >
+                {processingId === booking._id ? "Processing..." : "Check In"}
+              </button>
+            )}
+          </MenuItem>
+        )}
+
+        {canCheckOut && (
+          <MenuItem>
+            {({ active }) => (
+              <button
+                disabled={processingId === booking._id || !isCheckOutToday}
+                onClick={() => handleCheckOut(booking._id)}
+                className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                  processingId === booking._id || !isCheckOutToday
+                    ? "text-gray-400 cursor-not-allowed"
+                    : active
+                    ? "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400"
+                    : "text-purple-600 dark:text-purple-400"
+                }`}
+              >
+                {processingId === booking._id ? "Processing..." : "Check Out"}
+              </button>
+            )}
+          </MenuItem>
+        )}
+
+        {canCancel && (
+          <MenuItem>
+            {({ active }) => (
+              <button
+                disabled={processingId === booking._id}
+                onClick={() => handleCancelBooking(booking._id)}
+                className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                  processingId === booking._id
+                    ? "text-gray-400 cursor-not-allowed"
+                    : active
+                    ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
+                {processingId === booking._id
+                  ? "Processing..."
+                  : "Cancel Booking"}
+              </button>
+            )}
+          </MenuItem>
+        )}
+      </MenuItems>
+    </Menu>
+  );
+};
 
 const BookingTable = ({ onViewBooking }) => {
   const [bookings, setBookings] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cancelingId, setCancelingId] = useState(null);
+  const [processingId, setProcessingId] = useState(null);
   const [showCancelled, setShowCancelled] = useState(false);
-
   const [filters, setFilters] = useState({
     searchTerm: "",
     status: "all",
@@ -45,7 +159,7 @@ const BookingTable = ({ onViewBooking }) => {
     if (!window.confirm("Are you sure you want to cancel this booking?"))
       return;
     try {
-      setCancelingId(bookingId);
+      setProcessingId(bookingId);
       await cancelBooking(bookingId);
       setBookings((prev) =>
         prev.map((b) =>
@@ -57,15 +171,76 @@ const BookingTable = ({ onViewBooking }) => {
       console.error(error);
       alert("Failed to cancel booking");
     } finally {
-      setCancelingId(null);
+      setProcessingId(null);
     }
   };
 
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  const handleCheckIn = async (bookingId) => {
+    const booking = bookings.find((b) => b._id === bookingId);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkInDate = new Date(booking.checkIn);
+    checkInDate.setHours(0, 0, 0, 0);
+
+    if (today.getTime() !== checkInDate.getTime()) {
+      return alert(
+        "You can only check in on the guest's booked check-in date."
+      );
+    }
+
+    if (!window.confirm("Mark this booking as Checked In?")) return;
+    try {
+      setProcessingId(bookingId);
+      await checkInBooking(bookingId);
+      setBookings((prev) =>
+        prev.map((b) =>
+          b._id === bookingId ? { ...b, checkIn: new Date().toISOString() } : b
+        )
+      );
+      alert("Booking checked in successfully");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to check in");
+    } finally {
+      setProcessingId(null);
+    }
   };
 
-  const clearFilters = () => {
+  const handleCheckOut = async (bookingId) => {
+    const booking = bookings.find((b) => b._id === bookingId);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkOutDate = new Date(booking.checkOut);
+    checkOutDate.setHours(0, 0, 0, 0);
+
+    if (today.getTime() !== checkOutDate.getTime()) {
+      return alert(
+        "You can only check out on the guest's booked check-out date."
+      );
+    }
+
+    if (!window.confirm("Mark this booking as Checked Out?")) return;
+    try {
+      setProcessingId(bookingId);
+      await checkOutBooking(bookingId);
+      setBookings((prev) =>
+        prev.map((b) =>
+          b._id === bookingId ? { ...b, checkOut: new Date().toISOString() } : b
+        )
+      );
+      alert("Booking checked out successfully");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to check out");
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleFilterChange = (key, value) =>
+    setFilters((prev) => ({ ...prev, [key]: value }));
+
+  const clearFilters = () =>
     setFilters({
       searchTerm: "",
       status: "all",
@@ -74,18 +249,14 @@ const BookingTable = ({ onViewBooking }) => {
       dateFrom: "",
       dateTo: "",
     });
-  };
 
-  const hasActiveFilters = () => {
-    return (
-      filters.searchTerm ||
-      filters.status !== "all" ||
-      filters.roomType !== "all" ||
-      filters.paymentStatus !== "all" ||
-      filters.dateFrom ||
-      filters.dateTo
-    );
-  };
+  const hasActiveFilters = () =>
+    filters.searchTerm ||
+    filters.status !== "all" ||
+    filters.roomType !== "all" ||
+    filters.paymentStatus !== "all" ||
+    filters.dateFrom ||
+    filters.dateTo;
 
   const getRoomTypeName = (booking) => {
     if (booking.room?.roomType?.name) return booking.room.roomType.name;
@@ -135,10 +306,8 @@ const BookingTable = ({ onViewBooking }) => {
     bookingStatus: getBookingStatus(booking),
   }));
 
-  // Filter out cancelled bookings unless showCancelled is true
   const filteredBookings = categorizedBookings.filter((b) => {
     if (!showCancelled && b.bookingStatus.status === "cancelled") return false;
-
     const searchLower = filters.searchTerm.toLowerCase();
     const fullName = `${b.guestDetails?.firstName || ""} ${
       b.guestDetails?.lastName || ""
@@ -183,22 +352,31 @@ const BookingTable = ({ onViewBooking }) => {
 
   if (loading)
     return (
-      <p className="text-gray-500 dark:text-gray-300">Loading bookings...</p>
+      <div className="flex items-center justify-center py-12">
+        <div className="text-gray-500 dark:text-gray-300">
+          Loading bookings...
+        </div>
+      </div>
     );
+
   if (bookings.length === 0)
     return (
-      <p className="text-gray-500 dark:text-gray-300">No bookings found.</p>
+      <div className="flex items-center justify-center py-12">
+        <div className="text-gray-500 dark:text-gray-300">
+          No bookings found.
+        </div>
+      </div>
     );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
-          <h3 className="text-sm font-semibold text-green-800 dark:text-green-200">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-xl border border-green-200 dark:border-green-800">
+          <h3 className="text-sm font-semibold text-green-800 dark:text-green-200 mb-2">
             Confirmed Bookings
           </h3>
-          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+          <p className="text-3xl font-bold text-green-600 dark:text-green-400">
             {
               sortedBookings.filter(
                 (b) => b.bookingStatus.status === "confirmed"
@@ -206,11 +384,11 @@ const BookingTable = ({ onViewBooking }) => {
             }
           </p>
         </div>
-        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-          <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-200 dark:border-blue-800">
+          <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">
             Checked In
           </h3>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
             {
               sortedBookings.filter(
                 (b) => b.bookingStatus.status === "checked-in"
@@ -218,11 +396,11 @@ const BookingTable = ({ onViewBooking }) => {
             }
           </p>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-900/20 p-4 rounded-lg border border-gray-200 dark:border-gray-800">
-          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-            Completed
+        <div className="bg-gray-50 dark:bg-gray-900/20 p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            Checked Out/Completed
           </h3>
-          <p className="text-2xl font-bold text-gray-600 dark:text-gray-400">
+          <p className="text-3xl font-bold text-gray-600 dark:text-gray-400">
             {
               sortedBookings.filter(
                 (b) => b.bookingStatus.status === "completed"
@@ -232,55 +410,54 @@ const BookingTable = ({ onViewBooking }) => {
         </div>
       </div>
 
-      {/* Show Cancelled Switch */}
-      <div className="flex items-center mb-4 gap-2">
-        <input
-          type="checkbox"
-          id="showCancelled"
-          checked={showCancelled}
-          onChange={() => setShowCancelled(!showCancelled)}
-          className="w-4 h-4"
-        />
-        <label
-          htmlFor="showCancelled"
-          className="text-sm text-gray-700 dark:text-gray-300"
-        >
-          Show Cancelled Bookings
-        </label>
-      </div>
-      {/* Search & Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
+      {/* Search and Filter Controls */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        {/* Top Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Search by guest name or email..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               value={filters.searchTerm}
               onChange={(e) => handleFilterChange("searchTerm", e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-3">
+            {/* Show Cancelled Toggle */}
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                checked={showCancelled}
+                onChange={() => setShowCancelled(!showCancelled)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              Show Cancelled
+            </label>
+
             {hasActiveFilters() && (
               <button
                 onClick={clearFilters}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
               >
-                <X className="w-4 h-4" /> Clear Filters
+                <X className="w-4 h-4" /> Clear
               </button>
             )}
+
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+              className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-colors font-medium ${
                 showFilters || hasActiveFilters()
                   ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400"
                   : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
               }`}
             >
-              <Filter className="w-4 h-4" /> Filters
+              <Filter className="w-4 h-4" />
+              Filters
               {hasActiveFilters() && (
-                <span className="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                   {
                     [
                       filters.status !== "all",
@@ -296,10 +473,10 @@ const BookingTable = ({ onViewBooking }) => {
           </div>
         </div>
 
+        {/* Filter Panel */}
         {showFilters && (
-          <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
+          <div className="border-t border-gray-200 dark:border-gray-600 pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {/* Filters same as previous code */}
               {/* Booking Status */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -317,6 +494,7 @@ const BookingTable = ({ onViewBooking }) => {
                   <option value="cancelled">Cancelled</option>
                 </select>
               </div>
+
               {/* Room Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -329,7 +507,7 @@ const BookingTable = ({ onViewBooking }) => {
                   }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
-                  <option value="all">All Room Types</option>
+                  <option value="all">All Types</option>
                   {uniqueRoomTypes.map((rt) => (
                     <option key={rt} value={rt}>
                       {rt}
@@ -337,6 +515,7 @@ const BookingTable = ({ onViewBooking }) => {
                   ))}
                 </select>
               </div>
+
               {/* Payment Status */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -349,15 +528,16 @@ const BookingTable = ({ onViewBooking }) => {
                   }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
-                  <option value="all">All Payments</option>
+                  <option value="all">All</option>
                   <option value="paid">Paid</option>
-                  <option value="pending">Pending</option>
+                  <option value="unpaid">Unpaid</option>
                 </select>
               </div>
+
               {/* Date From */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Check-in From
+                  From Date
                 </label>
                 <input
                   type="date"
@@ -368,10 +548,11 @@ const BookingTable = ({ onViewBooking }) => {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               </div>
+
               {/* Date To */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Check-in To
+                  To Date
                 </label>
                 <input
                   type="date"
@@ -385,90 +566,108 @@ const BookingTable = ({ onViewBooking }) => {
         )}
       </div>
 
-      {/* Bookings Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow">
-          <thead>
-            <tr className="text-left border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-              <th className="p-4 text-gray-800 dark:text-gray-200">Guest</th>
-              <th className="p-4 text-gray-800 dark:text-gray-200">
-                Room Type
-              </th>
-              <th className="p-4 text-gray-800 dark:text-gray-200">Check-In</th>
-              <th className="p-4 text-gray-800 dark:text-gray-200">
-                Check-Out
-              </th>
-              <th className="p-4 text-gray-800 dark:text-gray-200">
-                Booking Status
-              </th>
-              <th className="p-4 text-gray-800 dark:text-gray-200">Payment</th>
-              <th className="p-4 text-gray-800 dark:text-gray-200">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedBookings.map((b) => (
-              <tr
-                key={b._id}
-                className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+      {/* Booking Table */}
+      <table className="w-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-900/50">
+          <tr>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+              Guest Details
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+              Room Type
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+              Check In
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+              Check Out
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+              Booking Status
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+              Payment
+            </th>
+            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+          {sortedBookings.length === 0 ? (
+            <tr>
+              <td
+                colSpan="7"
+                className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
               >
-                <td className="p-4 text-gray-900 dark:text-gray-100">
-                  {b.guestDetails?.firstName} {b.guestDetails?.lastName}
+                No bookings found matching your filters.
+              </td>
+            </tr>
+          ) : (
+            sortedBookings.map((booking) => (
+              <tr
+                key={booking._id}
+                className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              >
+                <td className="px-6 py-4">
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {booking.guestDetails?.firstName}{" "}
+                    {booking.guestDetails?.lastName}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {booking.guestDetails?.email}
+                  </div>
                 </td>
-                <td className="p-4 text-gray-900 dark:text-gray-100">
-                  {b.roomTypeName}
+                <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                  {booking.roomTypeName}
                 </td>
-                <td className="p-4 text-gray-900 dark:text-gray-100">
-                  {new Date(b.checkIn).toLocaleDateString()}
+                <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                  {new Date(booking.checkIn).toLocaleDateString()}
                 </td>
-                <td className="p-4 text-gray-900 dark:text-gray-100">
-                  {new Date(b.checkOut).toLocaleDateString()}
+                <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                  {new Date(booking.checkOut).toLocaleDateString()}
                 </td>
-                <td className="p-4">
+                <td className="px-6 py-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${b.bookingStatus.color} bg-gray-100 dark:bg-gray-900/30`}
-                  >
-                    {b.bookingStatus.label}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      b.status === "paid"
-                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                        : b.status === "cancelled"
-                        ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      booking.bookingStatus.status === "confirmed"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                        : booking.bookingStatus.status === "checked-in"
+                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+                        : booking.bookingStatus.status === "completed"
+                        ? "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400"
+                        : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
                     }`}
                   >
-                    {b.status === "paid"
-                      ? "Paid"
-                      : b.status === "cancelled"
-                      ? "Cancelled"
-                      : "Pending"}
+                    {booking.bookingStatus.label}
                   </span>
                 </td>
-                <td className="p-4 flex gap-2">
-                  <button
-                    onClick={() => onViewBooking(b._id)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                <td className="px-6 py-4">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                      booking.status === "paid"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                        : "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400"
+                    }`}
                   >
-                    View
-                  </button>
-                  {b.status !== "cancelled" && (
-                    <button
-                      onClick={() => handleCancelBooking(b._id)}
-                      disabled={cancelingId === b._id}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded disabled:opacity-50"
-                    >
-                      {cancelingId === b._id ? "Cancelling..." : "Cancel"}
-                    </button>
-                  )}
+                    {booking.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 text-center relative">
+                  <ActionsDropdown
+                    booking={booking}
+                    processingId={processingId}
+                    handleCheckIn={handleCheckIn}
+                    handleCheckOut={handleCheckOut}
+                    handleCancelBooking={handleCancelBooking}
+                    onViewBooking={onViewBooking}
+                  />
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            ))
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
