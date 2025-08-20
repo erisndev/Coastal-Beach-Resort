@@ -20,6 +20,7 @@ const DashboardCards = () => {
           fetchRoomTypes(),
         ]);
 
+        // Only active bookings
         const activeBookings = bookings.filter((b) => b.status !== "cancelled");
 
         // Total Guests
@@ -28,17 +29,9 @@ const DashboardCards = () => {
           0
         );
 
-        // Rooms Occupied Today
-        const roomsBookedToday = activeBookings.reduce((acc, b) => {
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const checkIn = new Date(b.checkIn);
-          const checkOut = new Date(b.checkOut);
-          checkIn.setHours(0, 0, 0, 0);
-          checkOut.setHours(0, 0, 0, 0);
-
-          if (today >= checkIn && today <= checkOut) {
-            // Count number of rooms in booking
+        // Rooms Occupied (checked-in only)
+        const roomsCheckedIn = activeBookings.reduce((acc, b) => {
+          if (b.status === "checked-in") {
             if (b.rooms && Array.isArray(b.rooms)) return acc + b.rooms.length;
             if (b.roomCount) return acc + b.roomCount;
             return acc + 1; // fallback if single room
@@ -48,15 +41,13 @@ const DashboardCards = () => {
 
         // Total Rooms in Resort
         const totalRooms = roomTypes.reduce(
-          (acc, rt) => acc + (rt.quantity || 0),
+          (acc, rt) => acc + (rt.totalUnits || 0),
           0
         );
 
         // Occupancy Rate
         const occupancyRate =
-          totalRooms > 0
-            ? Math.round((roomsBookedToday / totalRooms) * 100)
-            : 0;
+          totalRooms > 0 ? Math.round((roomsCheckedIn / totalRooms) * 100) : 0;
 
         // Payments Received
         const paymentsReceived = activeBookings
@@ -68,7 +59,7 @@ const DashboardCards = () => {
 
         setData({
           totalGuests,
-          roomsBooked: roomsBookedToday,
+          roomsBooked: roomsCheckedIn,
           paymentsReceived,
           totalBookings,
           occupancyRate,
@@ -94,7 +85,7 @@ const DashboardCards = () => {
     },
     {
       id: 2,
-      title: "Rooms Occupied Today",
+      title: "Rooms Occupied",
       value: data.roomsBooked,
       icon: <Bed size={24} />,
     },
