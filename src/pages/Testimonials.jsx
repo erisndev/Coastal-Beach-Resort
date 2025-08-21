@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { Star, Award, Shield, Zap, Mountain, StarHalf } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const Testimonials = () => {
   const [visibleCount, setVisibleCount] = useState(6);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const testimonials = [
     {
@@ -384,7 +386,10 @@ export const Testimonials = () => {
                   Inspired by our guests' stories? Plan your own unforgettable
                   escape at our award-winning coastal retreat.
                 </p>
-                <Button className="bg-white text-amber-700 px-10 py-4 rounded-full text-lg font-medium hover:bg-gray-50 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:text-amber-800">
+                <Button
+                  onClick={navigate("/appointment")}
+                  className="bg-white text-amber-700 px-10 py-4 rounded-full text-lg font-medium hover:bg-gray-50 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:text-amber-800"
+                >
                   Book Your Stay
                   <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
                     →

@@ -8,7 +8,11 @@ import {
   MapPin,
 } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTiktok } from "@fortawesome/free-brands-svg-icons";
+import {
+  faTiktok,
+  faInstagram,
+  faFacebook,
+} from "@fortawesome/free-brands-svg-icons";
 
 export const Footer = () => {
   return (
@@ -168,6 +172,7 @@ export const Footer = () => {
               inspiration.
             </p>
             <div className="flex space-x-4 justify-center md:justify-start">
+              {/* TikTok */}
               <a
                 href="https://www.tiktok.com/@coastalbeachresor/video/7537706157637406008?_t=ZS-8yom0dHBtDs&_r=1"
                 target="_blank"
@@ -182,6 +187,7 @@ export const Footer = () => {
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
 
+              {/* Twitter / X */}
               <a
                 href="https://x.com/coastal_re23852?s=21"
                 target="_blank"
@@ -194,12 +200,42 @@ export const Footer = () => {
                 />
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
+
+              {/* Instagram */}
+              <a
+                href="https://www.instagram.com/coastalbeachresort?igsh=MTJwdWp0ejR1aWpxYg=="
+                target="_blank"
+                className="group relative p-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-pink-500 hover:scale-110 hover:border-white/20"
+                aria-label="Instagram"
+              >
+                <FontAwesomeIcon
+                  icon={faInstagram}
+                  size="lg"
+                  className="text-slate-300 group-hover:text-white transition-colors duration-300"
+                />
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </a>
+
+              {/* Facebook */}
+              <a
+                href="https://www.facebook.com/share/17DB4xNdua/?mibextid=wwXIfr"
+                target="_blank"
+                className="group relative p-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-blue-600 hover:scale-110 hover:border-white/20"
+                aria-label="Facebook"
+              >
+                <FontAwesomeIcon
+                  icon={faFacebook}
+                  size="lg"
+                  className="text-slate-300 group-hover:text-white transition-colors duration-300"
+                />
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </a>
             </div>
           </div>
         </div>
 
         {/* Newsletter Section */}
-        <div className="mt-16 pt-12 border-t border-white/10">
+        {/* <div className="mt-16 pt-12 border-t border-white/10">
           <div className="text-center max-w-2xl mx-auto">
             <h3 className="text-2xl font-light text-white mb-4 tracking-wide">
               Stay Updated
@@ -219,7 +255,7 @@ export const Footer = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Copyright */}
         <div className="mt-16 pt-8 border-t border-white/10 text-center">
@@ -228,7 +264,7 @@ export const Footer = () => {
               © {new Date().getFullYear()} Coastal Beach Resort. All rights
               reserved.
             </p>
-            <div className="flex space-x-6 text-sm">
+            {/* <div className="flex space-x-6 text-sm">
               <a
                 href="#"
                 className="text-slate-400 hover:text-white transition-colors duration-300 font-light"
@@ -247,7 +283,7 @@ export const Footer = () => {
               >
                 Sitemap
               </a>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
