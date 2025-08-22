@@ -63,7 +63,7 @@ export const Home = () => {
           </p>
           <Button
             size="lg"
-            onclick={navigate("/appointment")}
+            onClick={navigate("/appointment")}
             className="relative overflow-hidden bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-12 py-4 rounded-full text-lg font-light tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 opacity-0 animate-[fadeInUp_1s_ease-out_2.5s_forwards]"
           >
             BOOK NOW
