@@ -216,7 +216,7 @@ const BookingTable = ({ onViewBooking }) => {
             ? {
                 ...b,
                 actualCheckOut: new Date().toISOString(),
-                // Assuming your API returns the updated status, or you can set it manually
+
                 bookingStatus: "checked-out",
               }
             : b
