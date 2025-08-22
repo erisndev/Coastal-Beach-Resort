@@ -8,6 +8,7 @@ import {
   checkInBooking,
   checkOutBooking,
 } from "../../../../API/Api";
+import { toast } from "react-toastify";
 
 const ActionsDropdown = ({
   booking,
@@ -24,12 +25,12 @@ const ActionsDropdown = ({
   checkInDate.setHours(0, 0, 0, 0);
   checkOutDate.setHours(0, 0, 0, 0);
 
+  // Use actual booking status from database instead of date-based logic
   const canCheckIn = booking.bookingStatus.status === "confirmed";
   const canCheckOut = booking.bookingStatus.status === "checked-in";
-  const canCancel = booking.status !== "cancelled";
-
-  const isCheckInToday = today.getTime() === checkInDate.getTime();
-  const isCheckOutToday = today.getTime() === checkOutDate.getTime();
+  const canCancel =
+    booking.status !== "cancelled" &&
+    booking.bookingStatus.status !== "checked-out";
 
   return (
     <Menu as="div" className="relative inline-block text-left">
@@ -59,10 +60,10 @@ const ActionsDropdown = ({
           <MenuItem>
             {({ active }) => (
               <button
-                disabled={processingId === booking._id || !isCheckInToday}
+                disabled={processingId === booking._id}
                 onClick={() => handleCheckIn(booking._id)}
                 className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                  processingId === booking._id || !isCheckInToday
+                  processingId === booking._id
                     ? "text-gray-400 cursor-not-allowed"
                     : active
                     ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400"
@@ -79,10 +80,10 @@ const ActionsDropdown = ({
           <MenuItem>
             {({ active }) => (
               <button
-                disabled={processingId === booking._id || !isCheckOutToday}
+                disabled={processingId === booking._id}
                 onClick={() => handleCheckOut(booking._id)}
                 className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                  processingId === booking._id || !isCheckOutToday
+                  processingId === booking._id
                     ? "text-gray-400 cursor-not-allowed"
                     : active
                     ? "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400"
@@ -166,72 +167,65 @@ const BookingTable = ({ onViewBooking }) => {
           b._id === bookingId ? { ...b, status: "cancelled" } : b
         )
       );
-      alert("Booking cancelled successfully");
+      toast.success("Booking cancelled successfully");
     } catch (error) {
       console.error(error);
-      alert("Failed to cancel booking");
+      toast("Failed to cancel booking");
     } finally {
       setProcessingId(null);
     }
   };
 
   const handleCheckIn = async (bookingId) => {
-    const booking = bookings.find((b) => b._id === bookingId);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const checkInDate = new Date(booking.checkIn);
-    checkInDate.setHours(0, 0, 0, 0);
-
-    if (today.getTime() !== checkInDate.getTime()) {
-      return alert(
-        "You can only check in on the guest's booked check-in date."
-      );
-    }
-
     if (!window.confirm("Mark this booking as Checked In?")) return;
     try {
       setProcessingId(bookingId);
       await checkInBooking(bookingId);
+      // Update the booking status to reflect the manual check-in
       setBookings((prev) =>
         prev.map((b) =>
-          b._id === bookingId ? { ...b, checkIn: new Date().toISOString() } : b
+          b._id === bookingId
+            ? {
+                ...b,
+                actualCheckIn: new Date().toISOString(),
+                // Assuming your API returns the updated status, or you can set it manually
+                bookingStatus: "checked-in",
+              }
+            : b
         )
       );
-      alert("Booking checked in successfully");
+      toast.success("Guest checked in successfully");
     } catch (error) {
       console.error(error);
-      alert("Failed to check in");
+      console.log(error);
+      toast.error("Failed to check in");
     } finally {
       setProcessingId(null);
     }
   };
 
   const handleCheckOut = async (bookingId) => {
-    const booking = bookings.find((b) => b._id === bookingId);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const checkOutDate = new Date(booking.checkOut);
-    checkOutDate.setHours(0, 0, 0, 0);
-
-    if (today.getTime() !== checkOutDate.getTime()) {
-      return alert(
-        "You can only check out on the guest's booked check-out date."
-      );
-    }
-
     if (!window.confirm("Mark this booking as Checked Out?")) return;
     try {
       setProcessingId(bookingId);
       await checkOutBooking(bookingId);
+      // Update the booking status to reflect the manual check-out
       setBookings((prev) =>
         prev.map((b) =>
-          b._id === bookingId ? { ...b, checkOut: new Date().toISOString() } : b
+          b._id === bookingId
+            ? {
+                ...b,
+                actualCheckOut: new Date().toISOString(),
+                // Assuming your API returns the updated status, or you can set it manually
+                bookingStatus: "checked-out",
+              }
+            : b
         )
       );
-      alert("Booking checked out successfully");
+      toast.success("Guest checked out successfully");
     } catch (error) {
       console.error(error);
-      alert("Failed to check out");
+      toast.error("Failed to check out");
     } finally {
       setProcessingId(null);
     }
@@ -270,34 +264,54 @@ const BookingTable = ({ onViewBooking }) => {
   };
 
   const getBookingStatus = (booking) => {
-    const today = new Date();
-    const checkIn = new Date(booking.checkIn);
-    const checkOut = new Date(booking.checkOut);
-    today.setHours(0, 0, 0, 0);
-    checkIn.setHours(0, 0, 0, 0);
-    checkOut.setHours(0, 0, 0, 0);
+    // Use the actual booking status from the database instead of date-based logic
+    // Assuming your booking object has a bookingStatus field from the API
+    if (booking.bookingStatus) {
+      // If it's a string status
+      if (typeof booking.bookingStatus === "string") {
+        const status = booking.bookingStatus.toLowerCase();
+        switch (status) {
+          case "cancelled":
+            return {
+              status: "cancelled",
+              label: "Cancelled",
+              color: "text-red-600",
+            };
+          case "checked-in":
+            return {
+              status: "checked-in",
+              label: "Checked In",
+              color: "text-blue-600",
+            };
+          case "checked-out":
+          case "completed":
+            return {
+              status: "completed",
+              label: "Completed",
+              color: "text-gray-500",
+            };
+          case "confirmed":
+          default:
+            return {
+              status: "confirmed",
+              label: "Confirmed",
+              color: "text-green-600",
+            };
+        }
+      }
+      // If it's an object with status property
+      if (booking.bookingStatus.status) {
+        return booking.bookingStatus;
+      }
+    }
 
-    if (booking.status === "cancelled")
+    // Fallback: if no explicit status, determine by payment/cancellation status only
+    if (booking.status === "cancelled") {
       return { status: "cancelled", label: "Cancelled", color: "text-red-600" };
-    if (checkOut < today)
-      return {
-        status: "completed",
-        label: "Completed",
-        color: "text-gray-500",
-      };
-    if (checkIn <= today && checkOut >= today)
-      return {
-        status: "checked-in",
-        label: "Checked In",
-        color: "text-blue-600",
-      };
-    if (checkIn > today)
-      return {
-        status: "confirmed",
-        label: "Confirmed",
-        color: "text-green-600",
-      };
-    return { status: "unknown", label: "Unknown", color: "text-gray-500" };
+    }
+
+    // Default to confirmed if no other status is found
+    return { status: "confirmed", label: "Confirmed", color: "text-green-600" };
   };
 
   const categorizedBookings = bookings.map((booking) => ({

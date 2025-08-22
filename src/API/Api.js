@@ -200,7 +200,7 @@ export const fetchBookingByReference = async (reference) => {
 // ===== NEW: Check-In / Check-Out API =====
 export const checkInBooking = async (bookingId) => {
   const res = await fetch(`${API_BASE}/bookings/check-in/${bookingId}`, {
-    method: "PATCH",
+    method: "PUT",
     headers: getAuthHeaders(),
   });
   if (!res.ok) {
@@ -212,7 +212,7 @@ export const checkInBooking = async (bookingId) => {
 
 export const checkOutBooking = async (bookingId) => {
   const res = await fetch(`${API_BASE}/bookings/check-out/${bookingId}`, {
-    method: "PATCH",
+    method: "PUT",
     headers: getAuthHeaders(),
   });
   if (!res.ok) {
