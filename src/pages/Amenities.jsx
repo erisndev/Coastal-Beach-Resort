@@ -100,7 +100,7 @@ export const Amenities = () => {
     {
       id: 1,
       title: "Internet Access",
-      image: "/api/placeholder/400/300", // Placeholder image
+      image: "./Internet Access.jpg", // Placeholder image
       imageTitle: "Stay connected throughout your stay.",
       description:
         "High-speed Wi-Fi connectivity available throughout the property, keeping you connected to work or loved ones when needed.",
@@ -108,7 +108,7 @@ export const Amenities = () => {
     {
       id: 2,
       title: "Parking Spaces",
-      image: "/api/placeholder/400/300", // Placeholder image
+      image: "./Parking Spaces.jpg", // Placeholder image
       imageTitle: "Convenient and secure vehicle storage.",
       description:
         "Ample parking spaces available for guests, ensuring your vehicle is safe and easily accessible during your stay.",
@@ -116,7 +116,7 @@ export const Amenities = () => {
     {
       id: 3,
       title: "Security Systems",
-      image: "/api/placeholder/400/300", // Placeholder image
+      image: "./Security Systems.jpg", // Placeholder image
       imageTitle: "Peace of mind, day and night.",
       description:
         "24/7 security monitoring and access control systems ensure the safety and security of all guests and their belongings.",
@@ -124,7 +124,7 @@ export const Amenities = () => {
     {
       id: 4,
       title: "Laundry Facilities",
-      image: "/api/placeholder/400/300", // Placeholder image
+      image: "./Laundry Facilities.jpg", // Placeholder image
       imageTitle: "Fresh and clean throughout your stay.",
       description:
         "On-site laundry facilities with modern washers and dryers, perfect for extended stays or keeping your beachwear fresh.",
@@ -132,7 +132,7 @@ export const Amenities = () => {
     {
       id: 5,
       title: "Kitchen Appliances",
-      image: "/api/placeholder/400/300", // Placeholder image
+      image: "./Kitchen Appliances.jpg", // Placeholder image
       imageTitle: "Cook with convenience and comfort.",
       description:
         "Fully equipped kitchens with modern appliances including refrigerators, stoves, microwaves, and all necessary cookware for a home-away-from-home experience.",

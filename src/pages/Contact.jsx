@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +19,8 @@ import L from "leaflet";
 import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
+import emailjs from "@emailjs/browser";
+import { useState } from "react";
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -40,6 +41,7 @@ export const Contact = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
   const position = [-30.1911, 30.7944];
 
@@ -96,6 +98,10 @@ export const Contact = () => {
         [field]: "",
       }));
     }
+    // Clear submit status when user starts typing again
+    if (submitStatus) {
+      setSubmitStatus(null);
+    }
   };
 
   const validateForm = () => {
@@ -115,18 +121,55 @@ export const Contact = () => {
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
+
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsSubmitting(false);
-    setShowSuccess(true);
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      reason: "",
-      message: "",
-    });
-    setTimeout(() => setShowSuccess(false), 5000);
+    setSubmitStatus(null);
+
+    // Clear any previous errors
+    setErrors({});
+
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          reason: formData.reason,
+          message: formData.message,
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      );
+
+      // Set success state
+      setSubmitStatus("success");
+      setShowSuccess(true);
+
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        reason: "",
+        message: "",
+      });
+
+      // Auto-hide success message after 8 seconds
+      setTimeout(() => {
+        setShowSuccess(false);
+        setSubmitStatus(null);
+      }, 8000);
+    } catch (error) {
+      console.error("EmailJS Error:", error);
+      setSubmitStatus("error");
+      setErrors((prev) => ({
+        ...prev,
+        submit: "Failed to send message. Please try again later.",
+      }));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -135,7 +178,7 @@ export const Contact = () => {
       <section
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url('/sun.jpg')`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
@@ -154,14 +197,27 @@ export const Contact = () => {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Success Alert */}
-        {showSuccess && (
-          <div className="mb-8 max-w-2xl mx-auto mt-8 opacity-0 animate-[fadeInUp_0.5s_ease-out_forwards]">
-            <Alert className="border-green-200 bg-green-50/80 backdrop-blur-sm shadow-lg rounded-2xl">
+        {/* Success Alert - Fixed positioning and visibility */}
+        {(showSuccess || submitStatus === "success") && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
+            <Alert className="border-green-200 bg-green-50 shadow-xl rounded-2xl animate-[slideInDown_0.5s_ease-out]">
               <CheckCircle className="h-5 w-5 text-green-600" />
-              <AlertDescription className="text-green-800 font-light">
+              <AlertDescription className="text-green-800 font-medium">
                 Thank you for your message! We have received your inquiry and
                 will get back to you within 24 hours.
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
+        {/* Error Alert */}
+        {(errors.submit || submitStatus === "error") && (
+          <div className="mb-8 max-w-2xl mx-auto mt-8">
+            <Alert className="border-red-200 bg-red-50 shadow-lg rounded-2xl">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <AlertDescription className="text-red-800 font-medium">
+                {errors.submit ||
+                  "Failed to send message. Please try again later."}
               </AlertDescription>
             </Alert>
           </div>
@@ -179,7 +235,7 @@ export const Contact = () => {
           </p>
         </section>
 
-        {/* Contact Info & Map Section */}
+        {/* Contact Info Section */}
         <section className="py-16 border-t border-slate-200">
           <div className="grid lg:grid-cols-2 gap-16">
             {/* Contact Information */}
@@ -435,12 +491,12 @@ export const Contact = () => {
                     Sending Message...
                   </div>
                 ) : (
-                  <>
+                  <div className="flex items-center justify-center">
                     Submit Message
                     <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
                       →
                     </span>
-                  </>
+                  </div>
                 )}
               </Button>
             </div>
@@ -448,7 +504,7 @@ export const Contact = () => {
         </section>
       </div>
 
-      {/* Add custom CSS animations and z-index fixes */}
+      {/* Custom CSS animations */}
       <style jsx>{`
         @keyframes fadeInUp {
           from {
@@ -470,17 +526,15 @@ export const Contact = () => {
           }
         }
 
-        /* Ensure leaflet map doesn't interfere with navbar */
-        .leaflet-container {
-          z-index: 1 !important;
-        }
-
-        .leaflet-control-container {
-          z-index: 2 !important;
-        }
-
-        .leaflet-popup {
-          z-index: 3 !important;
+        @keyframes slideInDown {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
         }
       `}</style>
     </div>

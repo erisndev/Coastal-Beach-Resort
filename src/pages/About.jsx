@@ -154,9 +154,9 @@ export const About = () => {
 
           <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl">
             <p className="text-xl md:text-2xl leading-relaxed font-light text-slate-700">
-              It is our vision to be able to be a power-house in the corporate
-              and social events business and be able to give accommodation to
-              all our clients on the resort by 2025.
+              Our vision is to become a leading force in the corporate and
+              social events industry, while providing exceptional accommodation
+              experiences for all our guests at the resort.
             </p>
           </div>
         </div>

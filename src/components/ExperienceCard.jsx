@@ -8,14 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export function ExperienceCard({
-  imageUrl,
-  imgAltTitle,
-  title,
-  description,
-  buttonText,
-  onClick,
-}) {
+export function ExperienceCard({ imageUrl, imgAltTitle, title, description }) {
   return (
     <div className="w-full max-w-sm mx-auto">
       <Card className="overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 text-center bg-white pt-0">
@@ -35,17 +28,6 @@ export function ExperienceCard({
             {description}
           </CardDescription>
         </CardHeader>
-        <CardFooter className="px-4 pb-4">
-          <div className="w-full active:scale-95 transition-transform duration-150">
-            <Button
-              className="w-full text-sm sm:text-base transition-all duration-300 hover:bg-amber-600 hover:text-white hover:scale-[1.02]"
-              variant="outline"
-              onClick={onClick}
-            >
-              {buttonText}
-            </Button>
-          </div>
-        </CardFooter>
       </Card>
     </div>
   );

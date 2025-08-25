@@ -24,8 +24,6 @@ export function Section({ title, subtitle, items }) {
               imgAltTitle={item.imageTitle}
               title={item.title}
               description={item.description}
-              buttonText="Learn More"
-              onClick={() => alert(`Clicked: ${item.title}`)}
             />
           </div>
         ))}
