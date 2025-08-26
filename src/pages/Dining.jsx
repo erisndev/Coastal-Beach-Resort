@@ -110,26 +110,28 @@ export const Dining = () => {
             <div className="w-16 h-px bg-amber-600 mx-auto"></div>
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-12 text-center transform hover:-translate-y-1">
-              <h3 className="text-3xl font-light text-slate-800 mb-6 tracking-wide">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-6 sm:p-10 md:p-12 text-center transform hover:-translate-y-1">
+              <h3 className="text-2xl sm:text-3xl font-light text-slate-800 mb-6 tracking-wide">
                 Weddings & Special Celebrations
               </h3>
-              <p className="text-slate-600 text-lg leading-relaxed mb-8 font-light">
+              <p className="text-slate-600 text-base sm:text-lg leading-relaxed mb-8 font-light">
                 Create magical memories at our stunning coastal venue. From
                 intimate ceremonies to grand receptions, our dedicated event
                 planning team will ensure every detail is perfect. Our versatile
                 spaces can accommodate gatherings with breathtaking views.
               </p>
-              <Button
-                onClick={handleContact}
-                className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-12 py-4 rounded-full text-lg font-light tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                Plan Your Event
-                <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </Button>
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleContact}
+                  className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-6 py-3 sm:px-10 sm:py-4 rounded-full text-base sm:text-lg font-light tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                >
+                  Plan Your Event
+                  <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
+                    →
+                  </span>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -143,26 +145,28 @@ export const Dining = () => {
             <div className="w-16 h-px bg-amber-600 mx-auto"></div>
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-12 text-center transform hover:-translate-y-1">
-              <h3 className="text-3xl font-light text-slate-800 mb-6 tracking-wide">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-6 sm:p-10 md:p-12 text-center transform hover:-translate-y-1">
+              <h3 className="text-2xl sm:text-3xl font-light text-slate-800 mb-6 tracking-wide">
                 Professional Event Services
               </h3>
-              <p className="text-slate-600 text-lg leading-relaxed mb-8 font-light">
+              <p className="text-slate-600 text-base sm:text-lg leading-relaxed mb-8 font-light">
                 Our experienced event coordinators work closely with you to
                 bring your vision to life. We offer comprehensive planning
                 services with attention to every detail, ensuring your special
                 day exceeds expectations.
               </p>
-              <Button
-                onClick={handleContact}
-                className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-12 py-4 rounded-full text-lg font-light tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                Contact Our Planners
-                <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </Button>
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleContact}
+                  className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-6 py-3 sm:px-10 sm:py-4 rounded-full text-base sm:text-lg font-light tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                >
+                  Contact Our Planners
+                  <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
+                    →
+                  </span>
+                </Button>
+              </div>
             </div>
           </div>
         </section>

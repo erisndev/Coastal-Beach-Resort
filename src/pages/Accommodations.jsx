@@ -231,8 +231,8 @@ export const Accommodations = () => {
       id: "standard-queen",
       name: "Standard Queen Room",
       images: [
-        "/PS5.jpg",
         "/PS2.jpg",
+        "/PS5.jpg",
         "/SC7.jpg",
         "/SC1.jpg",
         "/DD1.jpg",
@@ -574,16 +574,16 @@ export const Accommodations = () => {
         }}
       >
         <div className="text-center z-10 px-4">
-          <h1 className="text-6xl md:text-8xl font-extralight text-white mb-6 tracking-wider opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards]">
+          <h1 className="text-6xl sm:text-6xl md:text-8xl font-extralight text-white mb-5 tracking-wider opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards]">
             Luxury
           </h1>
-          <h1 className="text-6xl md:text-8xl font-light text-white mb-8 tracking-wider opacity-0 animate-[fadeInUp_1.5s_ease-out_1s_forwards]">
+          <h1 className="text-4xl sm:text-4xl md:text-7xl font-light text-white mb-7 tracking-wider opacity-0 animate-[fadeInUp_1.5s_ease-out_1s_forwards]">
             Accommodations
           </h1>
-          <p className="text-xl md:text-2xl text-white/90 mb-8 font-light tracking-wide opacity-0 animate-[fadeInUp_1.5s_ease-out_1.5s_forwards] max-w-3xl mx-auto">
+          <p className="text-xl sm:text-xl md:text-2xl text-white/90 mb-8 font-light tracking-wide opacity-0 animate-[fadeInUp_1.5s_ease-out_1.5s_forwards] max-w-3xl mx-auto px-3">
             Discover a sanctuary where luxury meets tranquility
           </p>
-          <div className="w-24 h-px bg-white mx-auto opacity-0 animate-[fadeIn_1s_ease-out_2s_forwards]"></div>
+          <div className="w-20 sm:w-24 h-px bg-white mx-auto opacity-0 animate-[fadeIn_1s_ease-out_2s_forwards]"></div>
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-50"></div>
       </section>

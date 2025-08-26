@@ -6,6 +6,43 @@
 @import "~slick-carousel/slick/slick-theme.css"; */
 @import "react-toastify/dist/ReactToastify.css";
 
+/* Phone input styling */
+.react-tel-input {
+  width: 100%;
+  position: relative;
+  font-family: inherit;
+}
+
+.react-tel-input .flag-dropdown {
+  border: 1px solid #e2e8f0; /* slate-200 */
+  background-color: #f8fafc; /* bg-slate-50 */
+  border-radius: 0.5rem 0 0 0.5rem !important; /* rounded-l-lg */
+  padding: 0 0.5rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.react-tel-input .form-control {
+  width: 100% !important;
+  height: 3rem !important;
+  padding: 0.75rem 0.75rem 0.75rem 4rem !important; /* add left padding for dropdown */
+  border-radius: 0.5rem !important; /* round right side only */
+  border: 1px solid #e2e8f0 !important; /* slate-200 */
+  background-color: #f8fafc !important; /* bg-slate-50 */
+  color: #1e293b !important; /* text-slate-800 */
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.react-tel-input .form-control:focus {
+  border-color: #f59e0b !important; /* amber-500 focus */
+}
+
+.react-tel-input.error .form-control {
+  border-color: #dc2626 !important; /* red-600 error */
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

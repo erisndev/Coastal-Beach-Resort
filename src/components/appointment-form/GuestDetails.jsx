@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import React, { useState, useEffect } from "react";
 import {
   ArrowLeft,
@@ -8,10 +7,12 @@ import {
   Mail,
   Phone,
   MapPin,
-  Calendar,
   Users,
   AlertCircle,
 } from "lucide-react";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 export const GuestDetails = ({
   bookingData,
@@ -24,13 +25,11 @@ export const GuestDetails = ({
 
   useEffect(() => {
     setGuest(bookingData.guestDetails || {});
-  }, []); // run only once on mount
+  }, []);
 
   const handleGuestDetailsChange = (field, value) => {
     setGuest((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const handleFieldBlur = () => {
@@ -40,7 +39,14 @@ export const GuestDetails = ({
     }));
   };
 
+  // Email validation
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // Phone validation using libphonenumber-js
+  const validatePhone = (phone) => {
+    const phoneNumber = parsePhoneNumberFromString(`+${phone}`);
+    return phoneNumber?.isValid() || false;
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -51,6 +57,8 @@ export const GuestDetails = ({
     else if (!validateEmail(guest.email))
       newErrors.email = "Please enter a valid email address";
     if (!guest.phone?.trim()) newErrors.phone = "Phone number is required";
+    else if (!validatePhone(guest.phone))
+      newErrors.phone = "Please enter a valid phone number";
     if (!guest.address?.trim()) newErrors.address = "Address is required";
     if (!guest.city?.trim()) newErrors.city = "City is required";
     if (!guest.country?.trim()) newErrors.country = "Country is required";
@@ -72,7 +80,8 @@ export const GuestDetails = ({
     guest.phone &&
     guest.address &&
     guest.city &&
-    guest.country;
+    guest.country &&
+    validatePhone(guest.phone);
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
@@ -180,16 +189,22 @@ export const GuestDetails = ({
                 <Phone className="w-4 h-4 text-slate-500" /> Phone Number{" "}
                 <span className="text-red-500">*</span>
               </label>
-              <input
-                type="tel"
-                placeholder="+1 (555) 123-4567"
-                className="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none"
+
+              <PhoneInput
+                country={"za"} // default country (South Africa)
                 value={guest.phone || ""}
-                onChange={(e) =>
-                  handleGuestDetailsChange("phone", e.target.value)
-                }
+                onChange={(phone) => handleGuestDetailsChange("phone", phone)}
                 onBlur={handleFieldBlur}
+                inputClass="w-full p-3 border rounded-lg bg-slate-50 focus:outline-none text-slate-800 placeholder-slate-400"
+                buttonClass="border border-slate-200 bg-slate-50 rounded-l-lg"
+                containerClass="w-full"
+                inputProps={{
+                  name: "phone",
+                  required: true,
+                }}
+                specialLabel=""
               />
+
               {errors.phone && (
                 <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
                   <AlertCircle className="w-4 h-4" /> {errors.phone}
@@ -369,19 +384,20 @@ export const GuestDetails = ({
       </div>
 
       {/* Navigation */}
-      <div className="mt-12 flex justify-between items-center">
+      <div className="mt-6 flex justify-between">
         <button
           onClick={onPrev}
-          className="flex items-center gap-2 px-8 py-4 rounded-xl border-2 border-slate-300 text-slate-600 font-semibold hover:border-slate-400 hover:text-slate-700 transition-all duration-200 hover:shadow-lg"
+          className="px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
         >
-          <ArrowLeft className="w-5 h-5" /> Back
+          Back
         </button>
+
         <button
           onClick={handleNext}
           disabled={!isFormValid()}
-          className="flex items-center gap-2 px-10 py-4 rounded-xl bg-amber-500 text-white font-semibold disabled:opacity-50 transition-all duration-200"
+          className="px-6 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold disabled:opacity-50"
         >
-          Continue <ArrowRight className="w-5 h-5" />
+          Continue
         </button>
       </div>
     </div>
