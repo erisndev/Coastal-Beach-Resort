@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
+  const bookingUrl = import.meta.env.VITE_NIGHTBRIDGE_URL;
 
   const navItems = [
     { id: 1, name: "Home", path: "/" },
@@ -24,11 +24,6 @@ export const Navbar = () => {
 
   const handleScroll = () => {
     setIsScrolled(window.scrollY > 50);
-  };
-
-  const handkeBook = () => {
-    navigate("/appointment");
-    closeNavbar();
   };
 
   useEffect(() => {
@@ -77,7 +72,7 @@ export const Navbar = () => {
             {/* Book Now Button */}
             <div className="hidden lg:flex items-center">
               <button
-                onClick={handkeBook}
+                onClick={() => window.open(bookingUrl, "_blank")}
                 className="relative overflow-hidden bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-8 py-1 rounded-full text-md font-light tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 opacity-0 animate-[fadeInUp_1s_ease-out_.5s_forwards]"
               >
                 Book Now
@@ -148,7 +143,7 @@ export const Navbar = () => {
             </div>
 
             <button
-              onClick={handkeBook}
+              onClick={() => window.open(bookingUrl, "_blank")}
               className="w-full bg-amber-600 cursor-pointer text-white py-3 rounded text-sm font-medium hover:bg-amber-700 transition-colors duration-200 mt-6 flex items-center justify-center"
             >
               Book Now
