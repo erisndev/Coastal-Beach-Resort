@@ -134,7 +134,7 @@ export const Footer = () => {
                 </div>
                 <div className="text-left">
                   <div className="text-slate-200 font-light tracking-wide">
-                    031 285 0538
+                    +27 31 285 0538
                   </div>
                   <div className="text-xs text-slate-400 mt-1 font-light">
                     Call us anytime

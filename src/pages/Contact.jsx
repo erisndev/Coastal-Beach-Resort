@@ -268,7 +268,7 @@ export const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-light text-slate-800 mb-1">Phone</h4>
-                    <p className="text-slate-600">031 285 0538</p>
+                    <p className="text-slate-600">+27 31 285 0538</p>
                   </div>
                 </div>
 
