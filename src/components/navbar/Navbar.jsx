@@ -17,6 +17,7 @@ export const Navbar = () => {
     { id: 6, name: "Events & Dining", path: "/dining" },
     { id: 7, name: "Contact", path: "/contact" },
     { id: 8, name: "Testimonials", path: "/testimonials" },
+    { id: 9, name: "Newsletters", path: "/newsletters" },
   ];
 
   const toggleNavbar = () => setOpen(!open);

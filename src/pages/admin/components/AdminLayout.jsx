@@ -12,7 +12,7 @@ export const AdminLayout = () => {
   return (
     <div className={`flex h-screen ${darkMode ? "dark" : ""}`}>
       {/* Sidebar */}
-      <Sidebar darkMode={darkMode} />
+      {/* <Sidebar darkMode={darkMode} /> */}
 
       {/* Main content */}
       <div className="flex-1 flex flex-col bg-gray-100 dark:bg-gray-900 transition-colors">

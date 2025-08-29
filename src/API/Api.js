@@ -221,3 +221,68 @@ export const checkOutBooking = async (bookingId) => {
   }
   return await res.json();
 };
+
+export const getNewsletters = async () => {
+  const res = await fetch(`${API_BASE}/newsletters`);
+  return res.json();
+};
+
+export const createNewsletter = async (data) => {
+  const formData = new FormData();
+  formData.append("title", data.title);
+  formData.append("date", data.date);
+  formData.append("content", data.content);
+
+  if (data.imageFile) {
+    formData.append("image", data.imageFile); // file object
+  } else if (data.image) {
+    formData.append("image", data.image); // optional URL
+  }
+
+  const res = await fetch(`${API_BASE}/newsletters`, {
+    method: "POST",
+    body: formData, // do NOT stringify
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || "Failed to create newsletter");
+  }
+  return res.json();
+};
+
+export const updateNewsletter = async (id, data) => {
+  const formData = new FormData();
+  formData.append("title", data.title);
+  formData.append("date", data.date);
+  formData.append("content", data.content);
+
+  if (data.imageFile) formData.append("image", data.imageFile);
+  else if (data.image) formData.append("image", data.image);
+
+  const res = await fetch(`${API_BASE}/newsletters/${id}`, {
+    method: "PUT",
+    body: formData, // do NOT stringify
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || "Failed to update newsletter");
+  }
+  return res.json();
+};
+
+export const deleteNewsletter = async (id) => {
+  const res = await fetch(`${API_BASE}/newsletters/${id}`, {
+    method: "DELETE",
+  });
+  return res.json();
+};
+
+// Fetch single newsletter by ID
+export const fetchNewsletterById = async (id) => {
+  const res = await fetch(`${API_BASE}/newsletters/${id}`);
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || "Failed to fetch newsletter");
+  }
+  return res.json();
+};

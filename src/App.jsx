@@ -26,6 +26,8 @@ import { AdminRoutes } from "./pages/admin/adminRoutes";
 // Optional: RequireAdmin HOC
 import RequireAdmin from "./pages/admin/components/RequireAdmin";
 import { ToastContainer } from "react-toastify";
+import { NewsletterList } from "./pages/NewsletterList";
+import { NewsletterDetail } from "./pages/NewsletterDetail";
 
 function AppContent() {
   const location = useLocation();
@@ -52,6 +54,8 @@ function AppContent() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/appointment" element={<Appointment />} />
+          <Route path="/newsletters" element={<NewsletterList />} />
+          <Route path="/newsletter/:id" element={<NewsletterDetail />} />
 
           {/* Admin Login */}
           <Route path="/admin/login" element={<Login />} />

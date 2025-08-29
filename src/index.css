@@ -6,6 +6,35 @@
 @import "~slick-carousel/slick/slick-theme.css"; */
 @import "react-toastify/dist/ReactToastify.css";
 
+@import "react-quill/dist/quill.snow.css";
+
+@keyframes bounce-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.animate-bounce-slow {
+  animation: bounce-slow 2s infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out forwards;
+}
+
 /* Phone input styling */
 .react-tel-input {
   width: 100%;

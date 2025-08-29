@@ -9,6 +9,7 @@ import { Payments } from "../admin/Payments";
 import { BookingCalendar } from "../admin/BookingCalendar";
 import { Login } from "../admin/Login";
 import RequireAdmin from "../admin/components/RequireAdmin";
+import { Newsletter } from "./Newsletter";
 
 export const AdminRoutes = () => {
   return (
@@ -25,17 +26,18 @@ export const AdminRoutes = () => {
           </RequireAdmin>
         }
       >
-        <Route index element={<Dashboard />} />
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route index element={<Newsletter />} />
+        {/* <Route path="dashboard" element={<Dashboard />} />
 
-        {/* Nested bookings route */}
+        
         <Route path="bookings" element={<Bookings />}>
           <Route path=":bookingId" element={<BookingDetails />} />
         </Route>
 
         <Route path="rooms" element={<Rooms />} />
         <Route path="payments" element={<Payments />} />
-        <Route path="calendar" element={<BookingCalendar />} />
+        <Route path="calendar" element={<BookingCalendar />} /> */}
+        <Route path="/" element={<Newsletter />} />
       </Route>
     </Routes>
   );
