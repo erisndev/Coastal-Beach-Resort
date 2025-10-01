@@ -1,15 +1,7 @@
 // src/pages/NewsletterList.jsx
 import React, { useEffect, useState } from "react";
-import {
-  Calendar,
-  Search,
-  Filter,
-  BookOpen,
-  Clock,
-  ArrowRight,
-} from "lucide-react";
+import { Calendar, Search, Filter, BookOpen, FileText } from "lucide-react";
 import { getNewsletters } from "@/API/Api";
-import { Link, useNavigate } from "react-router-dom";
 
 export const NewsletterList = () => {
   const [newsletters, setNewsletters] = useState([]);
@@ -20,17 +12,33 @@ export const NewsletterList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   const [yearFilter, setYearFilter] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchNewsletters = async () => {
       try {
         setLoading(true);
-        const data = await getNewsletters();
-        setNewsletters(data);
-        setFilteredNewsletters(data);
+        const response = await getNewsletters();
+        console.log("Newsletter response:", response);
+
+        // Handle the API response structure
+        let newslettersArray = [];
+
+        if (response && response.success && response.data) {
+          if (Array.isArray(response.data.newsletters)) {
+            newslettersArray = response.data.newsletters;
+          } else if (Array.isArray(response.data)) {
+            newslettersArray = response.data;
+          }
+        } else if (Array.isArray(response)) {
+          newslettersArray = response;
+        }
+
+        setNewsletters(newslettersArray);
+        setFilteredNewsletters(newslettersArray);
       } catch (err) {
         console.error("Failed to fetch newsletters:", err);
+        setNewsletters([]);
+        setFilteredNewsletters([]);
       } finally {
         setLoading(false);
       }
@@ -38,10 +46,43 @@ export const NewsletterList = () => {
     fetchNewsletters();
   }, []);
 
-  const handleReadNewsletter = (id) => {
-    console.log("Clicked newsletter ID:", id); // debug log
-    // navigate to the newsletter detail page
-    navigate(`/newsletter/${id}`);
+  const handleReadNewsletter = (newsletter) => {
+    // Get the PDF URL from the newsletter object
+    let pdfUrl = null;
+
+    if (newsletter.pdfUrl) {
+      if (typeof newsletter.pdfUrl === "object" && newsletter.pdfUrl.url) {
+        pdfUrl = newsletter.pdfUrl.url;
+      } else if (typeof newsletter.pdfUrl === "string") {
+        pdfUrl = newsletter.pdfUrl;
+      }
+    } else if (newsletter.pdf) {
+      if (typeof newsletter.pdf === "object" && newsletter.pdf.url) {
+        pdfUrl = newsletter.pdf.url;
+      } else if (typeof newsletter.pdf === "string") {
+        pdfUrl = newsletter.pdf;
+      }
+    }
+
+    if (pdfUrl) {
+      // Open PDF in new tab
+      window.open(pdfUrl, "_blank");
+    } else {
+      alert("PDF not available for this newsletter");
+    }
+  };
+
+  const getImageUrl = (newsletter) => {
+    const imageField =
+      newsletter.coverImage || newsletter.coverImageUrl || newsletter.image;
+    if (imageField) {
+      if (typeof imageField === "object" && imageField.url) {
+        return imageField.url;
+      } else if (typeof imageField === "string") {
+        return imageField;
+      }
+    }
+    return null;
   };
 
   useEffect(() => {
@@ -55,13 +96,13 @@ export const NewsletterList = () => {
 
     if (monthFilter) {
       filtered = filtered.filter(
-        (n) => new Date(n.date).getMonth() + 1 === parseInt(monthFilter)
+        (n) => new Date(n.publishDate).getMonth() + 1 === parseInt(monthFilter)
       );
     }
 
     if (yearFilter) {
       filtered = filtered.filter(
-        (n) => new Date(n.date).getFullYear() === parseInt(yearFilter)
+        (n) => new Date(n.publishDate).getFullYear() === parseInt(yearFilter)
       );
     }
 
@@ -75,15 +116,6 @@ export const NewsletterList = () => {
       setVisibleCount((prev) => prev + 6);
       setIsLoadingMore(false);
     }, 500);
-  };
-
-  const truncateContent = (html, maxLength = 120) => {
-    const div = document.createElement("div");
-    div.innerHTML = html;
-    const text = div.textContent || div.innerText || "";
-    return text.length > maxLength
-      ? text.substring(0, maxLength) + "..."
-      : text;
   };
 
   const formatDate = (dateString) => {
@@ -173,7 +205,9 @@ export const NewsletterList = () => {
                   <option value="">All Years</option>
                   {[
                     ...new Set(
-                      newsletters.map((n) => new Date(n.date).getFullYear())
+                      newsletters.map((n) =>
+                        new Date(n.publishDate).getFullYear()
+                      )
                     ),
                   ].map((year, index) => (
                     <option key={`year-${year}-${index}`} value={year}>
@@ -238,59 +272,78 @@ export const NewsletterList = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
                 {filteredNewsletters
                   .slice(0, visibleCount)
-                  .map((newsletter, index) => (
-                    <div
-                      key={`newsletter-${newsletter._id}-${index}`}
-                      className={`group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 bg-white
-                      ${
-                        index >= visibleCount - 6
-                          ? "opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]"
-                          : ""
-                      }`}
-                      style={{ animationDelay: `${(index % 3) * 100}ms` }}
-                    >
-                      {newsletter.image && (
-                        <div className="relative overflow-hidden h-56">
-                          <img
-                            src={newsletter.image}
-                            alt={newsletter.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                        </div>
-                      )}
+                  .map((newsletter, index) => {
+                    const imageUrl = getImageUrl(newsletter);
 
-                      <div className="p-6 flex-1 flex flex-col">
-                        <div className="flex items-center mb-3">
-                          <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                            <Clock className="w-3 h-3 inline mr-1" />
-                            {formatDate(newsletter.date)}
+                    return (
+                      <div
+                        key={`newsletter-${newsletter._id}-${index}`}
+                        className={`group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 bg-white
+                        ${
+                          index >= visibleCount - 6
+                            ? "opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]"
+                            : ""
+                        }`}
+                        style={{ animationDelay: `${(index % 3) * 100}ms` }}
+                      >
+                        {/* Cover Image */}
+                        <div className="relative overflow-hidden h-64">
+                          {imageUrl ? (
+                            <>
+                              <img
+                                src={imageUrl}
+                                alt={newsletter.title}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src =
+                                    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f3f4f6" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-family="sans-serif" font-size="20"%3ENo Image%3C/text%3E%3C/svg%3E';
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                            </>
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                              <BookOpen className="w-16 h-16 text-amber-600 opacity-50" />
+                            </div>
+                          )}
+
+                          {/* PDF Badge */}
+                          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                            <FileText className="w-4 h-4 text-green-600" />
+                            <span className="text-sm font-medium text-gray-800">
+                              PDF
+                            </span>
                           </div>
                         </div>
 
-                        <h2 className="text-xl md:text-2xl font-light text-slate-800 mb-4 leading-tight group-hover:text-amber-700 transition-colors duration-300">
-                          {newsletter.title}
-                        </h2>
+                        <div className="p-6 flex flex-col">
+                          {/* Title */}
+                          <h2 className="text-xl font-semibold text-slate-800 mb-3 leading-tight group-hover:text-amber-700 transition-colors duration-300 line-clamp-2">
+                            {newsletter.title}
+                          </h2>
 
-                        <p className="text-slate-600 mb-6 flex-1 leading-relaxed font-light">
-                          {truncateContent(newsletter.content)}
-                        </p>
+                          {/* Date */}
+                          <div className="flex items-center text-sm text-slate-500 mb-4">
+                            <Calendar className="w-4 h-4 mr-2" />
+                            {formatDate(newsletter.publishDate)}
+                          </div>
 
-                        <button
-                          onClick={() => handleReadNewsletter(newsletter._id)}
-                          className="relative z-10 inline-flex items-center text-amber-600 font-medium hover:text-amber-700 transition-all duration-300 cursor-pointer"
-                        >
-                          Read Full Newsletter
-                          <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300" />
-                        </button>
+                          {/* Read Newsletter Button */}
+                          <button
+                            onClick={() => handleReadNewsletter(newsletter)}
+                            className="w-full cursor-pointer bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-xl flex items-center justify-center gap-2"
+                          >
+                            <FileText className="w-5 h-5" />
+                            Read Newsletter
+                          </button>
+                        </div>
                       </div>
-
-                      <div className="absolute inset-0 bg-gradient-to-t from-amber-600/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </div>
-                  ))}
+                    );
+                  })}
               </div>
 
               {!allLoaded && (

@@ -2,28 +2,25 @@
 import { fetchNewsletterById } from "@/API/Api";
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock, Share2, Bookmark } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Share2, Download, Eye } from "lucide-react";
 
 export const NewsletterDetail = () => {
   const { id } = useParams();
   const [newsletter, setNewsletter] = useState(null);
-  const [readingTime, setReadingTime] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchNewsletter = async () => {
       try {
+        setLoading(true);
         const data = await fetchNewsletterById(id);
         setNewsletter(data);
-
-        // Calculate reading time (average 200 words per minute)
-        if (data.content) {
-          const wordCount = data.content
-            .replace(/<[^>]*>/g, "")
-            .split(/\s+/).length;
-          setReadingTime(Math.ceil(wordCount / 200));
-        }
       } catch (err) {
         console.error("Failed to fetch newsletter:", err);
+        setError("Failed to load newsletter");
+      } finally {
+        setLoading(false);
       }
     };
     fetchNewsletter();
@@ -46,12 +43,33 @@ export const NewsletterDetail = () => {
     }
   };
 
-  if (!newsletter) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-amber-500 border-t-transparent mb-4"></div>
           <p className="text-slate-600 font-medium">Loading newsletter...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !newsletter) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100">
+        <div className="text-center">
+          <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <FileText className="w-12 h-12 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-700 mb-2">
+            {error || "Newsletter Not Found"}
+          </h2>
+          <Link
+            to="/newsletters"
+            className="text-amber-600 hover:text-amber-700 font-medium mt-4 inline-block"
+          >
+            ← Back to Newsletters
+          </Link>
         </div>
       </div>
     );
@@ -78,26 +96,34 @@ export const NewsletterDetail = () => {
             </Link>
           </nav>
 
-          {/* Featured Image */}
-          {newsletter.image && (
+          {/* Cover Image */}
+          {newsletter.coverImage && (
             <div className="relative mb-8 group">
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
               <img
-                src={newsletter.image}
+                src={newsletter.coverImage}
                 alt={newsletter.title}
                 className="w-full h-[400px] sm:h-[500px] object-cover rounded-2xl shadow-xl group-hover:shadow-2xl transition-shadow duration-300"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              {/* PDF Badge on Image */}
+              {newsletter.pdfUrl && (
+                <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2 shadow-xl">
+                  <FileText className="w-5 h-5 text-green-600" />
+                  <span className="font-medium text-gray-800">PDF Available</span>
+                </div>
+              )}
             </div>
           )}
 
           {/* Article Header */}
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-4 text-sm text-slate-600 mb-6">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 mb-6">
               <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/20">
                 <Calendar size={16} />
                 <span>
-                  {new Date(newsletter.date).toLocaleDateString("en-US", {
+                  {new Date(newsletter.publishDate).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
@@ -105,11 +131,16 @@ export const NewsletterDetail = () => {
                 </span>
               </div>
 
-              {readingTime > 0 && (
-                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/20">
-                  <Clock size={16} />
-                  <span>{readingTime} min read</span>
-                </div>
+              {newsletter.pdfUrl && (
+                <a
+                  href={newsletter.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-green-100/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-green-200/20 hover:bg-green-200/80 transition-colors"
+                >
+                  <FileText size={16} className="text-green-700" />
+                  <span className="text-green-700 font-medium">View PDF</span>
+                </a>
               )}
             </div>
 
@@ -123,58 +154,112 @@ export const NewsletterDetail = () => {
       {/* Content Section */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <article className="bg-white rounded-3xl shadow-xl border border-white/20 overflow-hidden">
-          <div className="p-8 sm:p-12">
-            <div
-              className="prose prose-lg prose-slate max-w-none
-                         prose-headings:text-slate-900 prose-headings:font-bold
-                         prose-h1:text-3xl prose-h1:mb-6 prose-h1:mt-8 prose-h1:leading-tight
-                         prose-h2:text-2xl prose-h2:mb-4 prose-h2:mt-8 prose-h2:text-slate-800
-                         prose-h3:text-xl prose-h3:mb-3 prose-h3:mt-6 prose-h3:text-slate-800
-                         prose-p:text-slate-700 prose-p:leading-relaxed prose-p:mb-6
-                         prose-a:text-amber-600 prose-a:no-underline hover:prose-a:underline prose-a:font-medium
-                         prose-strong:text-slate-900 prose-strong:font-semibold
-                         prose-ul:my-6 prose-li:my-2 prose-li:text-slate-700
-                         prose-blockquote:border-l-4 prose-blockquote:border-amber-400 prose-blockquote:bg-amber-50/50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-slate-800
-                         prose-code:text-amber-700 prose-code:bg-amber-50 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-medium prose-code:text-sm
-                         prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:rounded-xl prose-pre:border-0
-                         prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8"
-              dangerouslySetInnerHTML={{ __html: newsletter.content }}
-            />
-          </div>
+          {/* PDF Viewer/Download Section */}
+          {newsletter.pdfUrl && (
+            <div className="p-8 sm:p-12 border-b border-slate-200">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                      <FileText className="w-8 h-8 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-slate-900 mb-1">
+                        Newsletter PDF
+                      </h3>
+                      <p className="text-slate-600">
+                        Download or view the full newsletter document
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <a
+                      href={newsletter.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white hover:bg-gray-50 text-slate-700 border border-slate-300 px-6 py-3 rounded-full font-medium transition-colors duration-200 shadow-sm hover:shadow-md flex items-center gap-2"
+                    >
+                      <Eye size={18} />
+                      View PDF
+                    </a>
+                    <a
+                      href={newsletter.pdfUrl}
+                      download
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-medium transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
+                    >
+                      <Download size={18} />
+                      Download
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Newsletter Description */}
+          {newsletter.description && (
+            <div className="p-8 sm:p-12">
+              <p className="text-lg text-slate-700 leading-relaxed">
+                {newsletter.description}
+              </p>
+            </div>
+          )}
 
           {/* Article Footer */}
           <div className="border-t border-slate-200 bg-slate-50/50 p-8 sm:p-12">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                  Enjoyed this newsletter?
+                  Stay Updated
                 </h3>
                 <p className="text-slate-600">
-                  Share it with others or save it for later reading.
+                  Don't miss our future newsletters and updates
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
+                {newsletter.pdfUrl && (
+                  <a
+                    href={newsletter.pdfUrl}
+                    download
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-medium transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
+                  >
+                    <Download size={18} />
+                    Download PDF
+                  </a>
+                )}
+                
                 <button
                   onClick={handleShare}
-                  className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-full font-medium transition-colors duration-200 shadow-lg hover:shadow-xl"
+                  className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-full font-medium transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
                 >
-                  Share Article
+                  <Share2 size={18} />
+                  Share
                 </button>
 
                 <Link
                   to="/newsletters"
                   className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 px-6 py-3 rounded-full font-medium transition-colors duration-200 shadow-sm hover:shadow-md"
                 >
-                  More Newsletters
+                  All Newsletters
                 </Link>
               </div>
             </div>
           </div>
         </article>
 
-        {/* Floating Action Button for Mobile */}
-        <div className="fixed bottom-6 right-6 sm:hidden">
+        {/* Floating Action Buttons for Mobile */}
+        <div className="fixed bottom-6 right-6 sm:hidden flex flex-col gap-3">
+          {newsletter.pdfUrl && (
+            <a
+              href={newsletter.pdfUrl}
+              download
+              className="bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105"
+            >
+              <Download size={20} />
+            </a>
+          )}
           <button
             onClick={handleShare}
             className="bg-amber-600 hover:bg-amber-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105"

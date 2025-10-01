@@ -222,27 +222,39 @@ export const checkOutBooking = async (bookingId) => {
   return await res.json();
 };
 
+// ===== Newsletter API =====
 export const getNewsletters = async () => {
-  const res = await fetch(`${API_BASE}/newsletters`);
+  const res = await fetch(`${API_BASE}/newsletters/public`);
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || "Failed to fetch newsletters");
+  }
   return res.json();
 };
 
-export const createNewsletter = async (data) => {
-  const formData = new FormData();
-  formData.append("title", data.title);
-  formData.append("date", data.date);
-  formData.append("content", data.content);
-
-  if (data.imageFile) {
-    formData.append("image", data.imageFile); // file object
-  } else if (data.image) {
-    formData.append("image", data.image); // optional URL
+export const getAdminNewsletters = async () => {
+  const res = await fetch(`${API_BASE}/newsletters/admin`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+    },
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || "Failed to fetch admin newsletters");
   }
+  return res.json();
+};
 
+export const createNewsletter = async (formData) => {
+  // formData is already a FormData object from the form
   const res = await fetch(`${API_BASE}/newsletters`, {
     method: "POST",
-    body: formData, // do NOT stringify
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+    },
+    body: formData, // Send FormData directly
   });
+
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.error || "Failed to create newsletter");
@@ -250,19 +262,16 @@ export const createNewsletter = async (data) => {
   return res.json();
 };
 
-export const updateNewsletter = async (id, data) => {
-  const formData = new FormData();
-  formData.append("title", data.title);
-  formData.append("date", data.date);
-  formData.append("content", data.content);
-
-  if (data.imageFile) formData.append("image", data.imageFile);
-  else if (data.image) formData.append("image", data.image);
-
+export const updateNewsletter = async (id, formData) => {
+  // formData is already a FormData object from the form
   const res = await fetch(`${API_BASE}/newsletters/${id}`, {
     method: "PUT",
-    body: formData, // do NOT stringify
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+    },
+    body: formData, // Send FormData directly
   });
+
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.error || "Failed to update newsletter");
@@ -273,7 +282,14 @@ export const updateNewsletter = async (id, data) => {
 export const deleteNewsletter = async (id) => {
   const res = await fetch(`${API_BASE}/newsletters/${id}`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+    },
   });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || "Failed to delete newsletter");
+  }
   return res.json();
 };
 
