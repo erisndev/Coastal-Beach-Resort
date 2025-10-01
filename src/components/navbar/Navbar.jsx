@@ -59,10 +59,10 @@ export const Navbar = () => {
                   key={item.id}
                   to={item.path}
                   onClick={closeNavbar}
-                  className={`text-sm font-extralight transition-colors duration-200  hover:text-amber-600 opacity-0 animate-[fadeInUp_1s_ease-out_.5s_forwards] ${
+                  className={`text-sm font-normal transition-colors duration-200  hover:text-amber-600 opacity-0 animate-[fadeInUp_1s_ease-out_.5s_forwards] ${
                     location.pathname === item.path
                       ? "text-amber-600"
-                      : "text-gray-700"
+                      : "text-gray-800"
                   }`}
                 >
                   {item.name}
