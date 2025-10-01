@@ -1,27 +1,33 @@
-import React, { useState, useEffect } from "react";
-import { X, Upload, FileText, Image as ImageIcon, Calendar } from "lucide-react";
+import React, { useState } from "react";
+import {
+  X,
+  Upload,
+  FileText,
+  Image as ImageIcon,
+  Calendar,
+} from "lucide-react";
 
 export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
   // Helper functions to extract data from object or string formats
   const getImageUrl = (imageData) => {
     if (!imageData) return "";
-    if (typeof imageData === 'object' && imageData.url) return imageData.url;
-    if (typeof imageData === 'string') return imageData;
+    if (typeof imageData === "object" && imageData.url) return imageData.url;
+    if (typeof imageData === "string") return imageData;
     return "";
   };
 
   const getPdfInfo = (pdfData) => {
     if (!pdfData) return { url: "", fileName: "" };
-    if (typeof pdfData === 'object') {
+    if (typeof pdfData === "object") {
       return {
         url: pdfData.url || "",
-        fileName: pdfData.fileName || "Existing PDF"
+        fileName: pdfData.fileName || "Existing PDF",
       };
     }
-    if (typeof pdfData === 'string') {
+    if (typeof pdfData === "string") {
       return {
         url: pdfData,
-        fileName: "Existing PDF"
+        fileName: "Existing PDF",
       };
     }
     return { url: "", fileName: "" };
@@ -35,7 +41,7 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
     }
     return "";
   });
-  
+
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState(() => {
     return getImageUrl(initialData?.coverImage || initialData?.coverImageUrl);
@@ -43,17 +49,17 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
   const [existingImageUrl] = useState(() => {
     return getImageUrl(initialData?.coverImage || initialData?.coverImageUrl);
   });
-  
+
   const [pdfFile, setPdfFile] = useState(null);
   const pdfInfo = getPdfInfo(initialData?.pdfUrl || initialData?.pdf);
   const [pdfFileName, setPdfFileName] = useState(pdfInfo.fileName);
   const [existingPdfUrl] = useState(pdfInfo.url);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!title || !publishDate) {
       alert("Please fill in all required fields");
       return;
@@ -78,18 +84,18 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Create FormData object
       const formData = new FormData();
       formData.append("title", title);
       formData.append("publishDate", publishDate);
-      
+
       // Append files if they exist
       if (coverImageFile) {
         formData.append("coverImage", coverImageFile, coverImageFile.name);
       }
-      
+
       if (pdfFile) {
         formData.append("pdf", pdfFile, pdfFile.name);
       }
@@ -101,7 +107,7 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
           console.log(`${key}:`, {
             name: value.name,
             size: value.size,
-            type: value.type
+            type: value.type,
           });
         } else {
           console.log(`${key}:`, value);
@@ -123,25 +129,25 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
       console.log("Selected image file:", {
         name: file.name,
         size: file.size,
-        type: file.type
+        type: file.type,
       });
-      
+
       // Validate file type
       if (!file.type.startsWith("image/")) {
         alert("Please select an image file");
         e.target.value = null;
         return;
       }
-      
+
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert("Image file size must be less than 5MB");
         e.target.value = null;
         return;
       }
-      
+
       setCoverImageFile(file);
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -157,23 +163,26 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
       console.log("Selected PDF file:", {
         name: file.name,
         size: file.size,
-        type: file.type
+        type: file.type,
       });
-      
+
       // Validate file type
-      if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith('.pdf')) {
+      if (
+        file.type !== "application/pdf" &&
+        !file.name.toLowerCase().endsWith(".pdf")
+      ) {
         alert("Please select a PDF file");
         e.target.value = null;
         return;
       }
-      
+
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         alert("PDF file size must be less than 10MB");
         e.target.value = null;
         return;
       }
-      
+
       setPdfFile(file);
       setPdfFileName(file.name);
     }
@@ -194,7 +203,9 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
     setPdfFile(null);
     // Restore existing PDF info when clearing new upload
     if (existingPdfUrl) {
-      setPdfFileName(getPdfInfo(initialData?.pdfUrl || initialData?.pdf).fileName);
+      setPdfFileName(
+        getPdfInfo(initialData?.pdfUrl || initialData?.pdf).fileName
+      );
     } else {
       setPdfFileName("");
     }
@@ -212,7 +223,9 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
               {initialData?._id ? "Edit Newsletter" : "Create Newsletter"}
             </h2>
             <p className="text-gray-600 text-lg">
-              {initialData?._id ? "Update newsletter content" : "Upload newsletter content for your subscribers"}
+              {initialData?._id
+                ? "Update newsletter content"
+                : "Upload newsletter content for your subscribers"}
             </p>
           </div>
 
@@ -259,7 +272,9 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
             <label className="block text-sm font-semibold mb-3 text-gray-700 transition-colors group-focus-within:text-blue-600">
               <ImageIcon className="inline w-4 h-4 mr-1" />
               Cover Image <span className="text-red-500">*</span>
-              <span className="text-gray-400 font-normal ml-2">(JPG, PNG, max 5MB)</span>
+              <span className="text-gray-400 font-normal ml-2">
+                (JPG, PNG, max 5MB)
+              </span>
             </label>
 
             {coverImagePreview ? (
@@ -271,7 +286,8 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
                     className="w-full h-64 object-cover transition-transform duration-300 hover:scale-105"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f3f4f6" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-family="sans-serif" font-size="20"%3EImage Error%3C/text%3E%3C/svg%3E';
+                      e.target.src =
+                        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f3f4f6" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-family="sans-serif" font-size="20"%3EImage Error%3C/text%3E%3C/svg%3E';
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -280,21 +296,29 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
                     onClick={clearCoverImage}
                     className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-all duration-200 transform hover:scale-110 shadow-lg"
                     disabled={isSubmitting}
-                    title={coverImageFile ? "Remove new image" : (existingImageUrl ? "Upload new image" : "Remove image")}
+                    title={
+                      coverImageFile
+                        ? "Remove new image"
+                        : existingImageUrl
+                        ? "Upload new image"
+                        : "Remove image"
+                    }
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
                 {coverImageFile && (
                   <div className="mt-3 text-sm text-gray-600 bg-white px-4 py-2 rounded-lg shadow-sm border">
-                    <span className="font-medium">New Image:</span> {coverImageFile.name}{" "}
-                    ({(coverImageFile.size / 1024 / 1024).toFixed(2)} MB)
+                    <span className="font-medium">New Image:</span>{" "}
+                    {coverImageFile.name} (
+                    {(coverImageFile.size / 1024 / 1024).toFixed(2)} MB)
                   </div>
                 )}
                 {!coverImageFile && existingImageUrl && (
                   <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      <strong>Current image:</strong> Click the X button to upload a new image
+                      <strong>Current image:</strong> Click the X button to
+                      upload a new image
                     </p>
                   </div>
                 )}
@@ -326,7 +350,9 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
             <label className="block text-sm font-semibold mb-3 text-gray-700 transition-colors group-focus-within:text-blue-600">
               <FileText className="inline w-4 h-4 mr-1" />
               Newsletter PDF <span className="text-red-500">*</span>
-              <span className="text-gray-400 font-normal ml-2">(PDF, max 10MB)</span>
+              <span className="text-gray-400 font-normal ml-2">
+                (PDF, max 10MB)
+              </span>
             </label>
 
             {pdfFileName || existingPdfUrl ? (
@@ -361,7 +387,13 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
                     onClick={clearPdf}
                     className="bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-all duration-200 transform hover:scale-110 shadow-lg"
                     disabled={isSubmitting}
-                    title={pdfFile ? "Remove new PDF" : (existingPdfUrl ? "Upload new PDF" : "Remove PDF")}
+                    title={
+                      pdfFile
+                        ? "Remove new PDF"
+                        : existingPdfUrl
+                        ? "Upload new PDF"
+                        : "Remove PDF"
+                    }
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -369,7 +401,8 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
                 {!pdfFile && existingPdfUrl && (
                   <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      <strong>Current PDF:</strong> Click the X button to upload a new PDF
+                      <strong>Current PDF:</strong> Click the X button to upload
+                      a new PDF
                     </p>
                   </div>
                 )}
@@ -408,8 +441,10 @@ export const NewsletterForm = ({ onSubmit, initialData = {}, onCancel }) => {
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                   Uploading...
                 </span>
+              ) : initialData?._id ? (
+                "Update Newsletter"
               ) : (
-                initialData?._id ? "Update Newsletter" : "Create Newsletter"
+                "Create Newsletter"
               )}
             </button>
             {onCancel && (
